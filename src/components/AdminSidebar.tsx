@@ -8,6 +8,7 @@ import {
   BarChart3,
   Settings,
   Image,
+  Tags
 } from "lucide-react";
 import {
   Sidebar,
@@ -28,6 +29,7 @@ const navigationItems = [
   { title: "Projects", url: "/projects", icon: FolderOpen },
   { title: "Users", url: "/users", icon: Users },
   { title: "Editors", url: "/editors", icon: Users },
+  { title: "Genres", url: "/genres", icon: Tags },
   { title: "Analytics", url: "/analytics", icon: BarChart3 },
   { title: "Cover Generator", url: "/cover-generator", icon: Image },
   { title: "Settings", url: "/settings", icon: Settings },

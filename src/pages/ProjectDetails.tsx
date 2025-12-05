@@ -1,577 +1,402 @@
-import { useState } from "react";
+/** @format */
+
+import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { 
-  ArrowLeft, 
-  FileText, 
-  User, 
-  Calendar, 
-  Hash, 
-  Mail, 
-  Shield, 
-  Edit3,
-  Upload,
-  Download,
-  Send,
-  Clock,
-  CheckCircle,
-  AlertCircle,
-  UserCheck,
-  Eye,
-  BookOpen,
-  Activity
+import { Label } from "@/components/ui/label";
+import {
+	ArrowLeft,
+	User,
+	Mail,
+	Hash,
+	FileText,
+	Calendar,
+	Edit3,
+	UserCheck,
 } from "lucide-react";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
-
-// Mock project data
-const mockProject = {
-  id: 1,
-  title: "The Digital Renaissance",
-  author: {
-    name: "Sarah Johnson",
-    email: "sarah.johnson@email.com",
-    avatar: "/api/placeholder/48/48",
-    bio: "Sarah is a technology writer with over 10 years of experience in digital transformation and AI. She has authored three previous books on emerging technologies.",
-    accountStatus: "verified",
-    joinDate: "2023-05-15",
-    totalManuscripts: 4
-  },
-  wordCount: 89500,
-  genre: "Technology",
-  submissionDate: "2024-01-15",
-  status: "in-progress",
-  assignedEditor: {
-    name: "Dr. Emily Carter",
-    role: "Super Admin",
-    email: "emily.carter@turningpages.com",
-    avatar: "/api/placeholder/48/48"
-  },
-  chapters: [
-    { id: 1, title: "Chapter 1: The Dawn of Digital Age", wordCount: 3500 },
-    { id: 2, title: "Chapter 2: AI and Human Creativity", wordCount: 4200 },
-    { id: 3, title: "Chapter 3: The Future of Work", wordCount: 3800 },
-    { id: 4, title: "Chapter 4: Digital Ethics", wordCount: 4100 },
-    { id: 5, title: "Chapter 5: Conclusion", wordCount: 2900 }
-  ],
-  otherManuscripts: [
-    { id: 2, title: "Machine Learning Basics", status: "completed", date: "2023-08-20" },
-    { id: 3, title: "The Future of AI", status: "delivered", date: "2023-11-15" },
-    { id: 4, title: "Digital Transformation Guide", status: "in-progress", date: "2024-01-10" }
-  ],
-  timeline: [
-    { id: 1, event: "Manuscript Submitted", date: "2024-01-15", time: "09:30 AM", type: "submitted" },
-    { id: 2, event: "Assigned to Dr. Emily Carter", date: "2024-01-16", time: "02:15 PM", type: "assigned" },
-    { id: 3, event: "Editorial review started", date: "2024-01-18", time: "10:00 AM", type: "editing" },
-    { id: 4, event: "Chapter 1-3 completed", date: "2024-01-25", time: "04:30 PM", type: "progress" },
-    { id: 5, event: "Author feedback requested", date: "2024-01-28", time: "11:20 AM", type: "feedback" }
-  ],
-  permissions: {
-    viewOnly: false,
-    edit: true,
-    deliver: true
-  },
-  notes: "Author is very responsive to feedback. Prefers detailed explanations for suggested changes. Technical accuracy is important - verify all AI-related claims.",
-  deliverables: [
-    { id: 1, name: "manuscript_draft_v1.docx", size: "2.3 MB", uploadDate: "2024-01-15" },
-    { id: 2, name: "edited_manuscript_v2.docx", size: "2.4 MB", uploadDate: "2024-01-25" }
-  ],
-  editorRemarks: "Excellent technical content. Made significant improvements to structure and flow. Ready for final review before delivery."
-};
-
-const editors = [
-  { name: "Dr. Emily Carter", role: "Super Admin" },
-  { name: "Marcus Rodriguez", role: "Senior Editor" },
-  { name: "Jessica Chen", role: "Senior Editor" },
-  { name: "David Thompson", role: "Assistant Editor" },
-  { name: "Lisa Wang", role: "Assistant Editor" }
-];
+import { GetProjectDetailsAPI } from "@/services/Api/ProjectApi";
 
 const getStatusBadge = (status: string) => {
-  switch (status) {
-    case "submitted":
-      return <Badge variant="secondary" className="bg-muted text-muted-foreground">Submitted</Badge>;
-    case "in-progress":
-      return <Badge className="bg-info text-info-foreground">In Progress</Badge>;
-    case "completed":
-      return <Badge className="bg-success text-success-foreground">Completed</Badge>;
-    case "delivered":
-      return <Badge className="bg-primary text-primary-foreground">Delivered</Badge>;
-    default:
-      return <Badge variant="secondary">{status}</Badge>;
-  }
-};
-
-const getRoleBadge = (role: string) => {
-  switch (role) {
-    case "Super Admin":
-      return <Badge variant="destructive">Super Admin</Badge>;
-    case "Senior Editor":
-      return <Badge variant="default">Senior Editor</Badge>;
-    case "Assistant Editor":
-      return <Badge variant="secondary">Assistant Editor</Badge>;
-    default:
-      return <Badge variant="outline">{role}</Badge>;
-  }
-};
-
-const getTimelineIcon = (type: string) => {
-  switch (type) {
-    case "submitted":
-      return <Upload className="h-4 w-4 text-blue-600" />;
-    case "assigned":
-      return <UserCheck className="h-4 w-4 text-green-600" />;
-    case "editing":
-      return <Edit3 className="h-4 w-4 text-orange-600" />;
-    case "progress":
-      return <Clock className="h-4 w-4 text-primary" />;
-    case "feedback":
-      return <AlertCircle className="h-4 w-4 text-yellow-600" />;
-    default:
-      return <Activity className="h-4 w-4 text-muted-foreground" />;
-  }
+	switch (status) {
+		case "draft":
+			return <Badge className="bg-muted text-muted-foreground">Draft</Badge>;
+		case "in-editing":
+			return <Badge className="bg-blue-500 text-white">In Editing</Badge>;
+		case "completed":
+			return <Badge className="bg-green-600 text-white">Completed</Badge>;
+		default:
+			return <Badge>{status}</Badge>;
+	}
 };
 
 const ProjectDetails = () => {
-  const [selectedEditor, setSelectedEditor] = useState(mockProject.assignedEditor.name);
-  const [permissions, setPermissions] = useState(mockProject.permissions);
-  const [notes, setNotes] = useState(mockProject.notes);
-  const [editorRemarks, setEditorRemarks] = useState(mockProject.editorRemarks);
-  const navigate = useNavigate();
-  const { toast } = useToast();
-  const [searchParams] = useSearchParams();
-  const projectId = searchParams.get("id") || "1";
+	const [project, setProject] = useState<any>(null);
+	const [selectedEditor, setSelectedEditor] = useState<string>("");
 
-  const handleBack = () => {
-    navigate("/projects");
-  };
+	const [searchParams] = useSearchParams();
+	const projectId = searchParams.get("id");
 
-  const handleOpenEditorial = () => {
-    navigate(`/editorial-suite?id=${projectId}`);
-  };
+	const navigate = useNavigate();
+	const { toast } = useToast();
 
-  const handleReassignEditor = () => {
-    toast({
-      title: "Editor Reassigned",
-      description: `Project has been reassigned to ${selectedEditor}.`,
-    });
-  };
+	const handleBack = () => navigate("/projects");
 
-  const handleSaveNotes = () => {
-    toast({
-      title: "Notes Saved",
-      description: "Internal notes have been updated successfully.",
-    });
-  };
+  const roleId = Number(localStorage.getItem("role_id"));
+const isSuperAdmin = roleId === 1;
 
-  const handleDeliverManuscript = () => {
-    navigate(`/deliver-manuscript?id=${projectId}`);
-  };
 
-  const handleDownloadFile = (fileName: string) => {
-    toast({
-      title: "Download Started",
-      description: `Downloading ${fileName}...`,
-    });
-  };
+	const loadProjectDetails = async () => {
+		try {
+			const res = await GetProjectDetailsAPI(projectId);
+			const p = res.data.data;
 
-  const formatFileSize = (bytes: string) => bytes;
+			const mapped = {
+				id: p.id,
+				title: p.title,
+				wordCount: p.word_count,
+				genre: p.book_genre?.title ?? "Unknown",
+				submissionDate: p.created_at,
+				status: p.status,
 
-  return (
-    <div className="space-y-6 max-w-7xl">
-      {/* Header */}
-      <div className="flex items-center gap-4">
-        <Button 
-          variant="ghost" 
-          size="icon"
-          onClick={handleBack}
-          className="hover:bg-muted"
-        >
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
-        <div className="flex-1">
-          <h1 className="text-3xl font-bold text-foreground">{mockProject.title}</h1>
-          <p className="text-muted-foreground mt-1">Project Details & Management</p>
-        </div>
-      </div>
+				author: {
+					name: p.book_user?.user_profile?.name ?? "Unknown Author",
+					email: p.book_user?.email ?? "",
+					avatar: "/api/placeholder/48/48",
+					joinDate: p.book_user?.user_profile?.created_at ?? "",
+					accountStatus: p.book_user?.status ?? "",
+					totalManuscripts: p.book_user?.user_books?.length ?? 0,
+				},
 
-      {/* Header Section */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-start justify-between">
-            <div className="space-y-4">
-              <div>
-                <h2 className="text-xl font-semibold">{mockProject.title}</h2>
-                <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-1">
-                    <User className="h-4 w-4" />
-                    {mockProject.author.name}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Mail className="h-4 w-4" />
-                    {mockProject.author.email}
-                  </div>
-                  <Badge variant="outline" className="text-green-600 border-green-600">
-                    {mockProject.author.accountStatus}
-                  </Badge>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-6 text-sm">
-                <div className="flex items-center gap-1">
-                  <Hash className="h-4 w-4 text-muted-foreground" />
-                  <span className="font-medium">{mockProject.wordCount.toLocaleString()}</span>
-                  <span className="text-muted-foreground">words</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <FileText className="h-4 w-4 text-muted-foreground" />
-                  <span>{mockProject.genre}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                  <span>{format(new Date(mockProject.submissionDate), "MMM dd, yyyy")}</span>
-                </div>
-              </div>
-            </div>
-            
-            <div className="text-right">
-              {getStatusBadge(mockProject.status)}
-            </div>
-          </div>
-        </CardHeader>
-      </Card>
+				assignedEditor: p.book_editors?.length
+					? {
+							name: p.book_editors[0].editor?.name ?? "Unknown",
+							email: p.book_editors[0].editor?.email ?? "",
+							role: p.book_editors[0].editor?.admin_role?.name ?? "",
+							avatar: "/api/placeholder/48/48",
+					  }
+					: null,
 
-      {/* Tabs */}
-      <Tabs defaultValue="manuscript" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="manuscript">Manuscript</TabsTrigger>
-          <TabsTrigger value="user-info">User Info</TabsTrigger>
-          <TabsTrigger value="editors">Editors & Access</TabsTrigger>
-          <TabsTrigger value="activity">Activity & Notes</TabsTrigger>
-          <TabsTrigger value="deliverables">Deliverables</TabsTrigger>
-        </TabsList>
+				chapters:
+					p.book_chapters?.map((ch: any) => ({
+						id: ch.id,
+						title: ch.title,
+						wordCount: ch.word_count,
+					})) ?? [],
 
-        {/* Manuscript Tab */}
-        <TabsContent value="manuscript" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BookOpen className="h-5 w-5 text-primary" />
-                Chapter Structure
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {mockProject.chapters.map((chapter, index) => (
-                  <div key={chapter.id} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div>
-                      <h4 className="font-medium">{chapter.title}</h4>
-                      <p className="text-sm text-muted-foreground">
-                        {chapter.wordCount.toLocaleString()} words
-                      </p>
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      Chapter {index + 1}
-                    </div>
-                  </div>
-                ))}
-              </div>
-              
-              <div className="mt-6 pt-6 border-t">
-                <Button onClick={handleOpenEditorial} className="bg-primary hover:bg-primary/90 text-primary-foreground">
-                  <Edit3 className="h-4 w-4 mr-2" />
-                  Open in Editorial Suite
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+				// NEW CODE
+				otherManuscripts:
+					p.book_user?.user_books
+						?.filter((b: any) => b.id !== p.id)
+						.map((b: any) => ({
+							id: b.id,
+							title: b.title,
+							status: b.status,
+							created_at: b.created_at,
+						})) ?? [],
+			};
 
-        {/* User Info Tab */}
-        <TabsContent value="user-info" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Author Profile</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-start gap-4">
-                <Avatar className="h-16 w-16">
-                  <AvatarImage src={mockProject.author.avatar} />
-                  <AvatarFallback>{mockProject.author.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
-                  <h3 className="text-lg font-semibold">{mockProject.author.name}</h3>
-                  <p className="text-muted-foreground">{mockProject.author.email}</p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Member since {format(new Date(mockProject.author.joinDate), "MMM yyyy")}
-                  </p>
-                  <p className="mt-3 text-sm">{mockProject.author.bio}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+			setProject(mapped);
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Other Manuscripts by {mockProject.author.name}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {mockProject.otherManuscripts.map((manuscript) => (
-                  <div key={manuscript.id} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div>
-                      <h4 className="font-medium">{manuscript.title}</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Submitted {format(new Date(manuscript.date), "MMM dd, yyyy")}
-                      </p>
-                    </div>
-                    {getStatusBadge(manuscript.status)}
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+			if (mapped.assignedEditor?.name) {
+				setSelectedEditor(mapped.assignedEditor.name);
+			}
+		} catch (err) {
+			console.error(err);
+			toast({
+				title: "Failed to load project",
+				variant: "destructive",
+			});
+		}
+	};
 
-        {/* Editors & Access Tab */}
-        <TabsContent value="editors" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Assigned Editor</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-start gap-4 mb-6">
-                <Avatar className="h-12 w-12">
-                  <AvatarImage src={mockProject.assignedEditor.avatar} />
-                  <AvatarFallback>{mockProject.assignedEditor.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
-                  <h3 className="font-semibold">{mockProject.assignedEditor.name}</h3>
-                  <p className="text-sm text-muted-foreground">{mockProject.assignedEditor.email}</p>
-                  <div className="mt-2">
-                    {getRoleBadge(mockProject.assignedEditor.role)}
-                  </div>
-                </div>
-              </div>
+	const safeFormatDate = (dateString: string | undefined) => {
+		if (!dateString) return "N/A";
+		const dt = new Date(dateString);
+		if (isNaN(dt.getTime())) return "N/A";
+		return format(dt, "MMM dd, yyyy");
+	};
 
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="reassign-editor" className="text-sm font-medium">
-                    Reassign Editor
-                  </Label>
-                  <div className="flex gap-2 mt-2">
-                    <Select value={selectedEditor} onValueChange={setSelectedEditor}>
-                      <SelectTrigger className="flex-1">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-popover border border-border z-50">
-                        {editors.map((editor) => (
-                          <SelectItem key={editor.name} value={editor.name} className="hover:bg-muted cursor-pointer">
-                            <div className="flex items-center justify-between w-full">
-                              <span>{editor.name}</span>
-                              <Badge variant="outline" className="ml-2 text-xs">
-                                {editor.role}
-                              </Badge>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Button onClick={handleReassignEditor} variant="outline">
-                      Reassign
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+	useEffect(() => {
+		loadProjectDetails();
+	}, []);
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Access Control</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label htmlFor="view-only">View Only</Label>
-                    <p className="text-sm text-muted-foreground">Can only view the manuscript</p>
-                  </div>
-                  <Switch
-                    id="view-only"
-                    checked={permissions.viewOnly}
-                    onCheckedChange={(checked) => 
-                      setPermissions(prev => ({ ...prev, viewOnly: checked }))
-                    }
-                  />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label htmlFor="edit">Edit Permission</Label>
-                    <p className="text-sm text-muted-foreground">Can edit the manuscript</p>
-                  </div>
-                  <Switch
-                    id="edit"
-                    checked={permissions.edit}
-                    onCheckedChange={(checked) => 
-                      setPermissions(prev => ({ ...prev, edit: checked }))
-                    }
-                  />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label htmlFor="deliver">Deliver Permission</Label>
-                    <p className="text-sm text-muted-foreground">Can deliver final manuscript</p>
-                  </div>
-                  <Switch
-                    id="deliver"
-                    checked={permissions.deliver}
-                    onCheckedChange={(checked) => 
-                      setPermissions(prev => ({ ...prev, deliver: checked }))
-                    }
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+	if (!project)
+		return (
+			<p className="text-center text-muted-foreground mt-10">Loading...</p>
+		);
 
-        {/* Activity & Notes Tab */}
-        <TabsContent value="activity" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Project Timeline</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ScrollArea className="h-64">
-                <div className="space-y-4">
-                  {mockProject.timeline.map((item, index) => (
-                    <div key={item.id} className="flex items-start gap-3">
-                      <div className="mt-1">
-                        {getTimelineIcon(item.type)}
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-medium">{item.event}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {format(new Date(item.date), "MMM dd, yyyy")} at {item.time}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </ScrollArea>
-            </CardContent>
-          </Card>
+	return (
+		<div className="space-y-6 max-w-7xl">
+			{/* HEADER */}
+			<div className="flex items-center gap-4">
+				<Button
+					variant="ghost"
+					size="icon"
+					onClick={handleBack}
+					className="hover:bg-muted"
+				>
+					<ArrowLeft className="h-4 w-4" />
+				</Button>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Internal Notes</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <Textarea
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Add internal notes about this project..."
-                  rows={6}
-                  className="resize-none"
-                />
-                <Button onClick={handleSaveNotes} variant="outline">
-                  Save Notes
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+				<div className="flex-1">
+					<h1 className="text-3xl font-bold">{project.title}</h1>
+					<p className="text-muted-foreground">Project Details & Management</p>
+				</div>
+			</div>
 
-        {/* Deliverables Tab */}
-        <TabsContent value="deliverables" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Manuscript Files</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {mockProject.deliverables.map((file) => (
-                  <div key={file.id} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <FileText className="h-5 w-5 text-muted-foreground" />
-                      <div>
-                        <p className="font-medium">{file.name}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {file.size} • Uploaded {format(new Date(file.uploadDate), "MMM dd, yyyy")}
-                        </p>
-                      </div>
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleDownloadFile(file.name)}
-                    >
-                      <Download className="h-4 w-4 mr-2" />
-                      Download
-                    </Button>
-                  </div>
-                ))}
-              </div>
+			{/* TOP SUMMARY CARD */}
+			<Card>
+				<CardHeader>
+					<div className="flex items-start justify-between">
+						<div className="space-y-4">
+							<h2 className="text-xl font-semibold">{project.title}</h2>
 
-              <div className="mt-6 p-4 border-2 border-dashed rounded-lg text-center">
-                <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                <p className="text-sm text-muted-foreground mb-2">
-                  Upload additional files (DOCX, PDF, EPUB)
-                </p>
-                <Button variant="outline" size="sm">
-                  Choose Files
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+							<div className="flex items-center gap-4 text-sm text-muted-foreground">
+								<div className="flex items-center gap-1">
+									<User className="h-4 w-4" />
+									{project.author.name}
+								</div>
+								<div className="flex items-center gap-1">
+									<Mail className="h-4 w-4" />
+									{project.author.email}
+								</div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Editor Remarks</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <Textarea
-                  value={editorRemarks}
-                  onChange={(e) => setEditorRemarks(e.target.value)}
-                  placeholder="Add remarks about the editing process..."
-                  rows={4}
-                  className="resize-none"
-                />
-                
-                <div className="flex gap-3">
-                  <Button 
-                    onClick={handleDeliverManuscript}
-                    className="bg-primary hover:bg-primary/90 text-primary-foreground"
-                  >
-                    <Send className="h-4 w-4 mr-2" />
-                    Deliver to Author
-                  </Button>
-                  <Button variant="outline">
-                    Save Remarks
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+								<Badge
+									variant="outline"
+									className="text-green-600 border-green-600"
+								>
+									{project.author.accountStatus}
+								</Badge>
+							</div>
+
+							<div className="flex items-center gap-6 text-sm">
+								<div className="flex items-center gap-1">
+									<Hash className="h-4 w-4" />
+									{project.wordCount?.toLocaleString()} words
+								</div>
+
+								<div className="flex items-center gap-1">
+									<FileText className="h-4 w-4" />
+									{project.genre}
+								</div>
+
+								<div className="flex items-center gap-1">
+									<Calendar className="h-4 w-4" />
+									{safeFormatDate(project.submissionDate)}
+								</div>
+							</div>
+						</div>
+
+						<div>{getStatusBadge(project.status)}</div>
+					</div>
+				</CardHeader>
+			</Card>
+
+			{/* TABS */}
+			<Tabs defaultValue="manuscript" className="space-y-6">
+				<TabsList className="grid w-full grid-cols-3">
+					<TabsTrigger value="manuscript">Manuscript</TabsTrigger>
+					<TabsTrigger value="user-info">User Info</TabsTrigger>
+					<TabsTrigger value="editors">Editors</TabsTrigger>
+				</TabsList>
+
+				{/* MANUSCRIPT TAB */}
+				<TabsContent value="manuscript">
+					<Card>
+						<CardHeader>
+							<CardTitle>Chapters</CardTitle>
+						</CardHeader>
+
+						<CardContent>
+							<div className="space-y-3">
+								{project.chapters.map((ch: any, index: number) => (
+									<div
+										key={ch.id}
+										className="flex items-center justify-between p-3 border rounded-lg"
+									>
+										<div>
+											<h4 className="font-medium">{ch.title}</h4>
+											<p className="text-muted-foreground text-sm">
+												{ch.wordCount?.toLocaleString()} words
+											</p>
+										</div>
+										<p className="text-muted-foreground">Chapter {index + 1}</p>
+									</div>
+								))}
+							</div>
+
+							<div className="pt-6 border-t mt-6">
+								<Button
+									onClick={() => navigate(`/editorial-suite?id=${project.id}`)}
+									className="bg-primary text-primary-foreground"
+								>
+									<Edit3 className="h-4 w-4 mr-2" />
+									Open Editorial Suite
+								</Button>
+							</div>
+						</CardContent>
+					</Card>
+				</TabsContent>
+
+				{/* USER INFO TAB */}
+				{/* USER INFO TAB */}
+				<TabsContent value="user-info">
+					<Card>
+						<CardHeader>
+							<CardTitle>Author Profile</CardTitle>
+						</CardHeader>
+
+						<CardContent>
+							<div className="flex items-start gap-4">
+								<Avatar className="h-16 w-16">
+									<AvatarImage src={project.author.avatar} />
+									<AvatarFallback>
+										{project.author.name
+											.split(" ")
+											.map((n: string) => n[0])
+											.join("")}
+									</AvatarFallback>
+								</Avatar>
+
+								<div className="flex-1">
+									<h3 className="text-lg font-semibold">
+										{project.author.name}
+									</h3>
+									<p className="text-muted-foreground">
+										{project.author.email}
+									</p>
+									<p className="text-sm text-muted-foreground mt-1">
+										Member since {safeFormatDate(project.author.joinDate)}
+									</p>
+								</div>
+							</div>
+						</CardContent>
+					</Card>
+
+					{/* OTHER MANUSCRIPTS */}
+					<Card className="mt-6">
+						<CardHeader>
+							<CardTitle>Other Manuscripts by {project.author.name}</CardTitle>
+						</CardHeader>
+
+						<CardContent>
+							{project.otherManuscripts.length === 0 ? (
+								<p className="text-muted-foreground">
+									No other manuscripts as of now.
+								</p>
+							) : (
+								<div className="space-y-3">
+									{project.otherManuscripts.map((m: any) => (
+										<div
+											key={m.id}
+											className="flex items-center justify-between p-3 border rounded-lg"
+										>
+											<div>
+												<h4 className="font-medium">{m.title}</h4>
+												<p className="text-sm text-muted-foreground">
+													Submitted {safeFormatDate(m.created_at)}
+												</p>
+											</div>
+
+											{/* Reuse your existing badge function */}
+											{getStatusBadge(m.status)}
+										</div>
+									))}
+								</div>
+							)}
+						</CardContent>
+					</Card>
+				</TabsContent>
+
+				{/* EDITORS TAB */}
+				<TabsContent value="editors">
+					<Card>
+						<CardHeader>
+							<CardTitle>Assigned Editor</CardTitle>
+						</CardHeader>
+
+						<CardContent>
+							{project.assignedEditor ? (
+								<>
+									<div className="flex items-start gap-4 mb-6">
+										<Avatar className="h-12 w-12">
+											<AvatarImage src={project.assignedEditor.avatar} />
+											<AvatarFallback>
+												{project.assignedEditor.name
+													.split(" ")
+													.map((n: string) => n[0])
+													.join("")}
+											</AvatarFallback>
+										</Avatar>
+
+										<div className="flex-1">
+											<h3 className="font-semibold">
+												{project.assignedEditor.name}
+											</h3>
+											<p className="text-sm text-muted-foreground">
+												{project.assignedEditor.email}
+											</p>
+											<Badge variant="outline" className="mt-2">
+												{project.assignedEditor.role}
+											</Badge>
+										</div>
+									</div>
+
+									{isSuperAdmin && (
+  <>
+    <Label>Reassign Editor</Label>
+    <div className="flex gap-2 mt-2">
+      <Select value={selectedEditor} onValueChange={setSelectedEditor}>
+        <SelectTrigger className="flex-1">
+          <SelectValue />
+        </SelectTrigger>
+
+        <SelectContent className="bg-popover border z-50">
+          <SelectItem value={project.assignedEditor.name}>
+            {project.assignedEditor.name}
+          </SelectItem>
+        </SelectContent>
+      </Select>
+
+      <Button
+        variant="outline"
+        onClick={() =>
+          toast({
+            title: "Editor reassigned",
+            description: `Assigned to ${selectedEditor}`,
+          })
+        }
+      >
+        <UserCheck className="h-4 w-4 mr-1" />
+        Reassign
+      </Button>
     </div>
-  );
+  </>
+)}
+
+								</>
+							) : (
+								<p className="text-muted-foreground">No editor assigned yet.</p>
+							)}
+						</CardContent>
+					</Card>
+				</TabsContent>
+			</Tabs>
+		</div>
+	);
 };
 
 export default ProjectDetails;

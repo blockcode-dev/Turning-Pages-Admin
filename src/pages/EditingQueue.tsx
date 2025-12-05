@@ -1,7 +1,10 @@
-import { useState } from "react";
+/** @format */
+
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { CalendarIcon, Eye, Filter } from "lucide-react";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+
 import {
   Select,
   SelectContent,
@@ -20,130 +24,127 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
+
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
+import axios from "axios";
+import { GetAllEditingQueueAPI } from "@/services/Api/ProjectApi";
 
-interface Manuscript {
-  id: string;
-  title: string;
-  author: string;
-  genre: string;
-  wordCount: number;
-  submissionDate: string;
-  status: "submitted" | "in-progress" | "delivered" | "completed";
-  submissionNotes: string;
-}
 
-const mockManuscripts: Manuscript[] = [
-  {
-    id: "1",
-    title: "The Digital Renaissance",
-    author: "Sarah Johnson",
-    genre: "Technology",
-    wordCount: 89500,
-    submissionDate: "2024-01-15",
-    status: "submitted",
-    submissionNotes: "First-time author looking for comprehensive editing support. Manuscript focuses on the intersection of AI and human creativity."
-  },
-  {
-    id: "2",
-    title: "Modern Poetry Collection",
-    author: "Michael Brown",
-    genre: "Poetry",
-    wordCount: 12000,
-    submissionDate: "2024-01-20",
-    status: "in-progress",
-    submissionNotes: "Collection of 50 contemporary poems. Author prefers minimal structural changes but open to stylistic suggestions."
-  },
-  {
-    id: "3",
-    title: "Science Fiction Anthology",
-    author: "Emma Davis",
-    genre: "Science Fiction",
-    wordCount: 125000,
-    submissionDate: "2024-01-10",
-    status: "delivered",
-    submissionNotes: "Anthology of 12 short stories. Author requests consistency check across all stories and character development feedback."
-  },
-  {
-    id: "4",
-    title: "Historical Novel: The Last Knight",
-    author: "Robert Wilson",
-    genre: "Historical Fiction",
-    wordCount: 95000,
-    submissionDate: "2024-01-25",
-    status: "completed",
-    submissionNotes: "Medieval historical fiction. Author is concerned about historical accuracy and period-appropriate dialogue."
-  },
-  {
-    id: "5",
-    title: "Business Strategy Guide",
-    author: "Lisa Anderson",
-    genre: "Business",
-    wordCount: 67000,
-    submissionDate: "2024-01-30",
-    status: "in-progress",
-    submissionNotes: "Professional development book. Target audience is mid-level managers. Needs clarity and structure improvements."
-  }
-];
-
-const genres = ["All Genres", "Technology", "Poetry", "Science Fiction", "Historical Fiction", "Business", "Romance", "Mystery", "Non-Fiction"];
-const statuses = ["All Statuses", "submitted", "in-progress", "delivered", "completed"];
+const statuses = ["All Statuses", "draft", "in-editing", "completed"];
 
 const getStatusBadge = (status: string) => {
+  const formatted =
+    status === "in-editing"
+      ? "In Editing"
+      : status.charAt(0).toUpperCase() + status.slice(1);
+
   switch (status) {
-    case "submitted":
-      return <Badge variant="secondary" className="bg-muted text-muted-foreground">Submitted</Badge>;
-    case "in-progress":
-      return <Badge className="bg-info text-info-foreground">In Progress</Badge>;
-    case "delivered":
-      return <Badge className="bg-success text-success-foreground">Delivered</Badge>;
+    case "draft":
+      return <Badge className="bg-muted text-muted-foreground">{formatted}</Badge>;
+    case "in-editing":
+      return <Badge className="bg-blue-500 text-white">{formatted}</Badge>;
     case "completed":
-      return <Badge className="bg-primary text-primary-foreground">Completed</Badge>;
+      return <Badge className="bg-green-600 text-white">{formatted}</Badge>;
     default:
-      return <Badge variant="secondary">{status}</Badge>;
+      return <Badge>{formatted}</Badge>;
   }
 };
 
+
 const EditingQueue = () => {
-  const [selectedGenre, setSelectedGenre] = useState<string>("All Genres");
-  const [selectedStatus, setSelectedStatus] = useState<string>("All Statuses");
+  const [manuscripts, setManuscripts] = useState<any[]>([]);
+  const [filtered, setFiltered] = useState<any[]>([]);
+
+  const [genres, setGenres] = useState<string[]>(["All Genres"]);
+
+  const [selectedGenre, setSelectedGenre] = useState("All Genres");
+  const [selectedStatus, setSelectedStatus] = useState("All Statuses");
   const [selectedDate, setSelectedDate] = useState<Date>();
-  const [selectedManuscript, setSelectedManuscript] = useState<Manuscript | null>(null);
+
+  const [selectedManuscript, setSelectedManuscript] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
   const navigate = useNavigate();
 
-  const filteredManuscripts = mockManuscripts.filter((manuscript) => {
-    if (selectedGenre !== "All Genres" && manuscript.genre !== selectedGenre) return false;
-    if (selectedStatus !== "All Statuses" && manuscript.status !== selectedStatus) return false;
-    if (selectedDate && manuscript.submissionDate !== format(selectedDate, "yyyy-MM-dd")) return false;
-    return true;
-  });
+  const loadManuscripts = async () => {
+    try {
+      const res = await GetAllEditingQueueAPI()
 
-  const handleViewManuscript = (manuscript: Manuscript) => {
-    setSelectedManuscript(manuscript);
+      const list = res.data.data || [];
+
+      setManuscripts(list);
+
+      // collect genres dynamically
+      const g = list.map((b: any) => b.book_genre?.title).filter(Boolean);
+      setGenres(["All Genres", ...new Set(g)]);
+
+      setFiltered(list);
+    } catch (err: any) {
+      if (
+        err.response?.data?.message === "You are not authorized to access this route"
+      ) {
+        return navigate("/unauthorized");
+      }
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    loadManuscripts();
+  }, []);
+
+  useEffect(() => {
+    let result = manuscripts;
+
+    if (selectedGenre !== "All Genres") {
+      result = result.filter((m) => m.book_genre?.title === selectedGenre);
+    }
+
+    if (selectedStatus !== "All Statuses") {
+      result = result.filter((m) => m.status === selectedStatus);
+    }
+
+    if (selectedDate) {
+      const ds = format(selectedDate, "yyyy-MM-dd");
+      result = result.filter((m) => m.created_at?.startsWith(ds));
+    }
+
+    setFiltered(result);
+  }, [selectedGenre, selectedStatus, selectedDate, manuscripts]);
+
+
+  const handleViewManuscript = (m: any) => {
+    setSelectedManuscript(m);
     setIsModalOpen(true);
   };
 
-  const formatWordCount = (count: number) => {
-    return count.toLocaleString();
-  };
+  const formatWordCount = (count: number) => count?.toLocaleString() || "0";
+
+  const formatStatus = (status: string) => {
+  if (status === "All Statuses") return status;
+  if (status === "in-editing") return "In Editing";
+
+  return status.charAt(0).toUpperCase() + status.slice(1);
+};
+
 
   return (
     <div className="space-y-6">
+      {/* HEADER */}
       <div>
         <h1 className="text-3xl font-bold text-foreground">Editing Queue</h1>
         <p className="text-muted-foreground mt-2">
@@ -151,48 +152,51 @@ const EditingQueue = () => {
         </p>
       </div>
 
-      {/* Filter Row */}
+      {/* FILTERS */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Filter className="h-5 w-5" />
-            Filters
+            <Filter className="h-5 w-5" /> Filters
           </CardTitle>
         </CardHeader>
+
         <CardContent>
           <div className="flex flex-wrap gap-4">
-            <div className="flex flex-col space-y-2">
+            {/* GENRE FILTER */}
+            <div>
               <label className="text-sm font-medium">Genre</label>
               <Select value={selectedGenre} onValueChange={setSelectedGenre}>
                 <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Select genre" />
+                  <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {genres.map((genre) => (
-                    <SelectItem key={genre} value={genre}>
-                      {genre}
+                  {genres.map((g) => (
+                    <SelectItem key={g} value={g}>
+                      {g}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
 
-            <div className="flex flex-col space-y-2">
+            {/* STATUS FILTER */}
+            <div>
               <label className="text-sm font-medium">Status</label>
               <Select value={selectedStatus} onValueChange={setSelectedStatus}>
                 <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Select status" />
+                  <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {statuses.map((status) => (
-                    <SelectItem key={status} value={status}>
-                      {status === "All Statuses" ? status : status.charAt(0).toUpperCase() + status.slice(1).replace("-", " ")}
+                  {statuses.map((s) => (
+                    <SelectItem key={s} value={s}>
+                   {formatStatus(s)}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
 
+            {/* DATE FILTER */}
             <div className="flex flex-col space-y-2">
               <label className="text-sm font-medium">Submission Date</label>
               <Popover>
@@ -205,21 +209,22 @@ const EditingQueue = () => {
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
+                    {selectedDate ? format(selectedDate, "PPP") : "Pick a date"}
                   </Button>
                 </PopoverTrigger>
+
                 <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
                     selected={selectedDate}
                     onSelect={setSelectedDate}
                     initialFocus
-                    className="p-3 pointer-events-auto"
                   />
                 </PopoverContent>
               </Popover>
             </div>
 
+            {/* CLEAR BUTTON */}
             <div className="flex items-end">
               <Button
                 variant="outline"
@@ -236,13 +241,12 @@ const EditingQueue = () => {
         </CardContent>
       </Card>
 
-      {/* Manuscript Table */}
+      {/* TABLE */}
       <Card>
         <CardHeader>
-          <CardTitle>
-            Manuscripts ({filteredManuscripts.length})
-          </CardTitle>
+          <CardTitle>Manuscripts ({filtered.length})</CardTitle>
         </CardHeader>
+
         <CardContent>
           <Table>
             <TableHeader>
@@ -256,20 +260,24 @@ const EditingQueue = () => {
                 <TableHead>Action</TableHead>
               </TableRow>
             </TableHeader>
+
             <TableBody>
-              {filteredManuscripts.map((manuscript) => (
-                <TableRow key={manuscript.id}>
-                  <TableCell className="font-medium">{manuscript.title}</TableCell>
-                  <TableCell>{manuscript.author}</TableCell>
-                  <TableCell>{manuscript.genre}</TableCell>
-                  <TableCell>{formatWordCount(manuscript.wordCount)}</TableCell>
-                  <TableCell>{format(new Date(manuscript.submissionDate), "MMM dd, yyyy")}</TableCell>
-                  <TableCell>{getStatusBadge(manuscript.status)}</TableCell>
+              {filtered.map((m) => (
+                <TableRow key={m.id}>
+                  <TableCell className="font-medium">{m.title}</TableCell>
+                  <TableCell>{m.book_user?.user_profile?.name || "Unknown"}</TableCell>
+                  <TableCell>{m.book_genre?.title || "-"}</TableCell>
+                  <TableCell>{formatWordCount(m.word_count)}</TableCell>
+                  <TableCell>
+                    {format(new Date(m.created_at), "MMM dd, yyyy")}
+                  </TableCell>
+                  <TableCell>{getStatusBadge(m.status)}</TableCell>
+
                   <TableCell>
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handleViewManuscript(manuscript)}
+                      onClick={() => handleViewManuscript(m)}
                       className="flex items-center gap-2"
                     >
                       <Eye className="h-4 w-4" />
@@ -278,10 +286,11 @@ const EditingQueue = () => {
                   </TableCell>
                 </TableRow>
               ))}
-              {filteredManuscripts.length === 0 && (
+
+              {filtered.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                    No manuscripts found matching the current filters.
+                    No manuscripts found.
                   </TableCell>
                 </TableRow>
               )}
@@ -290,67 +299,65 @@ const EditingQueue = () => {
         </CardContent>
       </Card>
 
-      {/* Manuscript Details Modal */}
+      {/* MODAL */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Manuscript Details</DialogTitle>
-            <DialogDescription>
-              Review manuscript information and take action
-            </DialogDescription>
           </DialogHeader>
-          
+
           {selectedManuscript && (
             <div className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Title</label>
+                  <label className="text-sm text-muted-foreground">Title</label>
                   <p className="text-lg font-semibold">{selectedManuscript.title}</p>
                 </div>
+
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Author</label>
-                  <p className="text-lg font-semibold">{selectedManuscript.author}</p>
+                  <label className="text-sm text-muted-foreground">Author</label>
+                  <p className="text-lg font-semibold">
+                    {selectedManuscript.book_user?.user_profile?.name}
+                  </p>
                 </div>
+
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Genre</label>
-                  <p>{selectedManuscript.genre}</p>
+                  <label className="text-sm text-muted-foreground">Genre</label>
+                  <p>{selectedManuscript.book_genre?.title}</p>
                 </div>
+
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Word Count</label>
-                  <p>{formatWordCount(selectedManuscript.wordCount)} words</p>
+                  <label className="text-sm text-muted-foreground">Word Count</label>
+                  <p>{formatWordCount(selectedManuscript.word_count)} words</p>
                 </div>
+
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Submission Date</label>
-                  <p>{format(new Date(selectedManuscript.submissionDate), "MMMM dd, yyyy")}</p>
+                  <label className="text-sm text-muted-foreground">
+                    Submission Date
+                  </label>
+                  <p>
+                    {format(new Date(selectedManuscript.created_at), "MMMM dd, yyyy")}
+                  </p>
                 </div>
+
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Status</label>
-                  <div className="mt-1">
-                    {getStatusBadge(selectedManuscript.status)}
-                  </div>
+                  <label className="text-sm text-muted-foreground">Status</label>
+                  <div className="mt-1">{getStatusBadge(selectedManuscript.status)}</div>
                 </div>
-              </div>
-              
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">Submission Notes</label>
-                <p className="mt-1 text-sm leading-relaxed bg-muted/30 p-4 rounded-lg">
-                  {selectedManuscript.submissionNotes}
-                </p>
               </div>
 
               <div className="flex gap-3 pt-4">
-                <Button 
+                <Button
                   onClick={() => {
                     setIsModalOpen(false);
                     navigate(`/assign-project?id=${selectedManuscript.id}`);
                   }}
-                  className="bg-primary hover:bg-primary-hover text-primary-foreground"
+                  className="bg-primary text-primary-foreground"
                 >
                   Assign Project
                 </Button>
-                <Button variant="outline">
-                  Open in Editorial Suite
-                </Button>
+
+                <Button variant="outline">Open in Editorial Suite</Button>
               </div>
             </div>
           )}
