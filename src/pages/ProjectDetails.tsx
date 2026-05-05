@@ -24,27 +24,52 @@ import {
 	Calendar,
 	Edit3,
 	UserCheck,
+	BookOpen,
+	Layers,
 } from "lucide-react";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
-import { GetProjectDetailsAPI } from "@/services/Api/ProjectApi";
+import {
+	AssignEditorToBookAPI,
+	GetProjectDetailsAPI,
+} from "@/services/Api/ProjectApi";
+import { GetAllEditorsAPI } from "@/services/Api/EditorApi";
 
 const getStatusBadge = (status: string) => {
 	switch (status) {
 		case "draft":
-			return <Badge className="bg-muted text-muted-foreground">Draft</Badge>;
+			return (
+				<Badge className="bg-muted text-muted-foreground whitespace-nowrap">
+					Draft
+				</Badge>
+			);
 		case "in-editing":
-			return <Badge className="bg-blue-500 text-white">In Editing</Badge>;
+			return (
+				<Badge className="bg-blue-500 text-white whitespace-nowrap">
+					In Editing
+				</Badge>
+			);
 		case "completed":
-			return <Badge className="bg-green-600 text-white">Completed</Badge>;
+			return (
+				<Badge className="bg-green-600 text-white whitespace-nowrap">
+					Completed
+				</Badge>
+			);
+		case "feedback":
+			return (
+				<Badge className="bg-orange-500 text-white whitespace-nowrap">
+					Feedback
+				</Badge>
+			);
 		default:
-			return <Badge>{status}</Badge>;
+			return <Badge className="whitespace-nowrap">{status}</Badge>;
 	}
 };
 
 const ProjectDetails = () => {
 	const [project, setProject] = useState<any>(null);
 	const [selectedEditor, setSelectedEditor] = useState<string>("");
+	const [apiEditors, setApiEditors] = useState<any[]>([]);
 
 	const [searchParams] = useSearchParams();
 	const projectId = searchParams.get("id");
@@ -52,11 +77,15 @@ const ProjectDetails = () => {
 	const navigate = useNavigate();
 	const { toast } = useToast();
 
-	const handleBack = () => navigate("/projects");
+	const roleId = Number(localStorage.getItem("role_id"));
+	const isSuperAdmin = roleId === 1;
 
-  const roleId = Number(localStorage.getItem("role_id"));
-const isSuperAdmin = roleId === 1;
-
+	const safeFormatDate = (dateString: string | undefined) => {
+		if (!dateString) return "N/A";
+		const dt = new Date(dateString);
+		if (isNaN(dt.getTime())) return "N/A";
+		return format(dt, "MMM dd, yyyy");
+	};
 
 	const loadProjectDetails = async () => {
 		try {
@@ -86,7 +115,7 @@ const isSuperAdmin = roleId === 1;
 							email: p.book_editors[0].editor?.email ?? "",
 							role: p.book_editors[0].editor?.admin_role?.name ?? "",
 							avatar: "/api/placeholder/48/48",
-					  }
+						}
 					: null,
 
 				chapters:
@@ -96,7 +125,6 @@ const isSuperAdmin = roleId === 1;
 						wordCount: ch.word_count,
 					})) ?? [],
 
-				// NEW CODE
 				otherManuscripts:
 					p.book_user?.user_books
 						?.filter((b: any) => b.id !== p.id)
@@ -110,70 +138,108 @@ const isSuperAdmin = roleId === 1;
 
 			setProject(mapped);
 
-			if (mapped.assignedEditor?.name) {
-				setSelectedEditor(mapped.assignedEditor.name);
+			if (p.book_editors?.length) {
+				setSelectedEditor(p.book_editors[0].editor_id?.toString());
 			}
 		} catch (err) {
 			console.error(err);
+			toast({ title: "Failed to load project", variant: "destructive" });
+		}
+	};
+
+	const loadEditors = async () => {
+		try {
+			const res = await GetAllEditorsAPI();
+			setApiEditors(res.data.data || []);
+		} catch (err) {
+			console.error("Failed to load editors", err);
+		}
+	};
+
+	useEffect(() => {
+		loadEditors();
+		loadProjectDetails();
+	}, []);
+
+	const handleAssignProject = async () => {
+		if (!selectedEditor) {
+			return toast({
+				title: "Error",
+				description: "Please select an editor.",
+				variant: "destructive",
+			});
+		}
+		try {
+			await AssignEditorToBookAPI({
+				editor_id: Number(selectedEditor),
+				book_id: Number(project.id),
+			});
 			toast({
-				title: "Failed to load project",
+				title: "Editor Assigned",
+				description: `"${project.title}" has been assigned successfully.`,
+			});
+			loadProjectDetails();
+		} catch (err: any) {
+			toast({
+				title: "Assignment Failed",
+				description: err.response?.data?.message || "Something went wrong.",
 				variant: "destructive",
 			});
 		}
 	};
 
-	const safeFormatDate = (dateString: string | undefined) => {
-		if (!dateString) return "N/A";
-		const dt = new Date(dateString);
-		if (isNaN(dt.getTime())) return "N/A";
-		return format(dt, "MMM dd, yyyy");
-	};
-
-	useEffect(() => {
-		loadProjectDetails();
-	}, []);
-
 	if (!project)
 		return (
-			<p className="text-center text-muted-foreground mt-10">Loading...</p>
+			<div className="flex items-center justify-center min-h-[40vh]">
+				<p className="text-muted-foreground animate-pulse">Loading project...</p>
+			</div>
 		);
 
+	const isInEditing = project.status?.toLowerCase().trim() === "in-editing";
+
 	return (
-		<div className="space-y-6 max-w-7xl">
-			{/* HEADER */}
-			<div className="flex items-center gap-4">
+		<div className="space-y-5 max-w-7xl px-2 sm:px-0">
+
+			{/* ── Header ── */}
+			<div className="flex items-start gap-3">
 				<Button
 					variant="ghost"
 					size="icon"
-					onClick={handleBack}
-					className="hover:bg-muted"
+					onClick={() => navigate("/projects")}
+					className="hover:bg-muted mt-0.5 shrink-0"
 				>
 					<ArrowLeft className="h-4 w-4" />
 				</Button>
-
-				<div className="flex-1">
-					<h1 className="text-3xl font-bold">{project.title}</h1>
-					<p className="text-muted-foreground">Project Details & Management</p>
+				<div className="min-w-0">
+					<h1 className="text-2xl sm:text-3xl font-bold leading-tight truncate">
+						{project.title}
+					</h1>
+					<p className="text-muted-foreground text-sm mt-0.5">
+						Project Details & Management
+					</p>
 				</div>
 			</div>
 
-			{/* TOP SUMMARY CARD */}
+			{/* ── Summary Card ── */}
 			<Card>
-				<CardHeader>
-					<div className="flex items-start justify-between">
-						<div className="space-y-4">
-							<h2 className="text-xl font-semibold">{project.title}</h2>
+				<CardHeader className="pb-4">
+					<div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+						{/* Left: title + meta */}
+						<div className="space-y-3 min-w-0">
+							<h2 className="text-lg sm:text-xl font-semibold truncate">
+								{project.title}
+							</h2>
 
-							<div className="flex items-center gap-4 text-sm text-muted-foreground">
-								<div className="flex items-center gap-1">
-									<User className="h-4 w-4" />
+							{/* Author info — wraps on mobile */}
+							<div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm text-muted-foreground">
+								<span className="flex items-center gap-1.5">
+									<User className="h-3.5 w-3.5 shrink-0" />
 									{project.author.name}
-								</div>
-								<div className="flex items-center gap-1">
-									<Mail className="h-4 w-4" />
-									{project.author.email}
-								</div>
-
+								</span>
+								<span className="flex items-center gap-1.5 min-w-0">
+									<Mail className="h-3.5 w-3.5 shrink-0" />
+									<span className="truncate">{project.author.email}</span>
+								</span>
 								<Badge
 									variant="outline"
 									className="text-green-600 border-green-600"
@@ -182,86 +248,147 @@ const isSuperAdmin = roleId === 1;
 								</Badge>
 							</div>
 
-							<div className="flex items-center gap-6 text-sm">
-								<div className="flex items-center gap-1">
-									<Hash className="h-4 w-4" />
+							{/* Book meta — wraps on mobile */}
+							<div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-sm">
+								<span className="flex items-center gap-1.5 text-muted-foreground">
+									<Hash className="h-3.5 w-3.5 shrink-0" />
 									{project.wordCount?.toLocaleString()} words
-								</div>
-
-								<div className="flex items-center gap-1">
-									<FileText className="h-4 w-4" />
+								</span>
+								<span className="flex items-center gap-1.5 text-muted-foreground">
+									<FileText className="h-3.5 w-3.5 shrink-0" />
 									{project.genre}
-								</div>
-
-								<div className="flex items-center gap-1">
-									<Calendar className="h-4 w-4" />
+								</span>
+								<span className="flex items-center gap-1.5 text-muted-foreground">
+									<Calendar className="h-3.5 w-3.5 shrink-0" />
 									{safeFormatDate(project.submissionDate)}
-								</div>
+								</span>
 							</div>
 						</div>
 
-						<div>{getStatusBadge(project.status)}</div>
+						{/* Right: status badge */}
+						<div className="shrink-0">{getStatusBadge(project.status)}</div>
 					</div>
 				</CardHeader>
 			</Card>
 
-			{/* TABS */}
-			<Tabs defaultValue="manuscript" className="space-y-6">
-				<TabsList className="grid w-full grid-cols-3">
-					<TabsTrigger value="manuscript">Manuscript</TabsTrigger>
-					<TabsTrigger value="user-info">User Info</TabsTrigger>
-					<TabsTrigger value="editors">Editors</TabsTrigger>
-				</TabsList>
+			{/* ── Tabs ── */}
+			<Tabs defaultValue="manuscript" className="space-y-5">
+				{/* Tab list — scrollable on very small screens */}
+				<div className="overflow-x-auto -mx-2 px-2 sm:mx-0 sm:px-0">
+					<TabsList className="grid grid-cols-4 min-w-[360px] w-full">
+						<TabsTrigger value="manuscript" className="text-xs sm:text-sm">
+							Manuscript
+						</TabsTrigger>
+						<TabsTrigger value="cover-generator" className="text-xs sm:text-sm">
+							<span className="hidden sm:inline">Cover Generator</span>
+							<span className="sm:hidden">Cover</span>
+						</TabsTrigger>
+						<TabsTrigger value="user-info" className="text-xs sm:text-sm">
+							<span className="hidden sm:inline">User Info</span>
+							<span className="sm:hidden">User</span>
+						</TabsTrigger>
+						<TabsTrigger value="editors" className="text-xs sm:text-sm">
+							Editors
+						</TabsTrigger>
+					</TabsList>
+				</div>
 
-				{/* MANUSCRIPT TAB */}
+				{/* ── Manuscript Tab ── */}
 				<TabsContent value="manuscript">
 					<Card>
-						<CardHeader>
-							<CardTitle>Chapters</CardTitle>
+						<CardHeader className="pb-3">
+							<CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+								<Layers className="h-4 w-4" />
+								Chapters
+								<span className="ml-auto text-sm font-normal text-muted-foreground">
+									{project.chapters.length} chapter
+									{project.chapters.length !== 1 ? "s" : ""}
+								</span>
+							</CardTitle>
 						</CardHeader>
 
-						<CardContent>
-							<div className="space-y-3">
-								{project.chapters.map((ch: any, index: number) => (
+						<CardContent className="space-y-3">
+							{project.chapters.length === 0 ? (
+								<p className="text-muted-foreground text-sm">
+									No chapters found.
+								</p>
+							) : (
+								project.chapters.map((ch: any, index: number) => (
 									<div
 										key={ch.id}
-										className="flex items-center justify-between p-3 border rounded-lg"
+										className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/40 transition-colors gap-3"
 									>
-										<div>
-											<h4 className="font-medium">{ch.title}</h4>
-											<p className="text-muted-foreground text-sm">
+										<div className="min-w-0">
+											<h4 className="font-medium text-sm truncate">{ch.title}</h4>
+											<p className="text-muted-foreground text-xs mt-0.5">
 												{ch.wordCount?.toLocaleString()} words
 											</p>
 										</div>
-										<p className="text-muted-foreground">Chapter {index + 1}</p>
+										<span className="text-xs text-muted-foreground shrink-0">
+											Ch. {index + 1}
+										</span>
 									</div>
-								))}
-							</div>
+								))
+							)}
 
-							<div className="pt-6 border-t mt-6">
+							<div className="pt-5 border-t mt-2">
 								<Button
-									onClick={() => navigate(`/editorial-suite?id=${project.id}`)}
-									className="bg-primary text-primary-foreground"
+									disabled={!isInEditing}
+									onClick={() => {
+										if (isInEditing) navigate(`/editorial-suite?id=${project.id}`);
+									}}
+									className="w-full sm:w-auto bg-primary text-primary-foreground disabled:opacity-50"
 								>
 									<Edit3 className="h-4 w-4 mr-2" />
 									Open Editorial Suite
 								</Button>
+								{!isInEditing && (
+									<p className="text-xs text-muted-foreground mt-2">
+										Editorial Suite is only available when the project is{" "}
+										<span className="font-medium">In Editing</span>.
+									</p>
+								)}
 							</div>
 						</CardContent>
 					</Card>
 				</TabsContent>
 
-				{/* USER INFO TAB */}
-				{/* USER INFO TAB */}
-				<TabsContent value="user-info">
+				{/* ── Cover Generator Tab ── */}
+				<TabsContent value="cover-generator">
 					<Card>
-						<CardHeader>
-							<CardTitle>Author Profile</CardTitle>
+						<CardHeader className="pb-3">
+							<CardTitle className="text-base sm:text-lg">
+								Generate Book Cover
+							</CardTitle>
 						</CardHeader>
+						<CardContent className="space-y-4">
+							<p className="text-muted-foreground text-sm">
+								Create an AI-generated book cover using the book's title, genre,
+								and author details.
+							</p>
+							<Button
+								className="w-full sm:w-auto bg-primary text-primary-foreground"
+								onClick={() => navigate(`/cover-generator?id=${project.id}`)}
+							>
+								Open Cover Generator
+							</Button>
+						</CardContent>
+					</Card>
+				</TabsContent>
 
+				{/* ── User Info Tab ── */}
+				<TabsContent value="user-info" className="space-y-5">
+					{/* Author Profile Card */}
+					<Card>
+						<CardHeader className="pb-3">
+							<CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+								<User className="h-4 w-4" />
+								Author Profile
+							</CardTitle>
+						</CardHeader>
 						<CardContent>
 							<div className="flex items-start gap-4">
-								<Avatar className="h-16 w-16">
+								<Avatar className="h-14 w-14 shrink-0">
 									<AvatarImage src={project.author.avatar} />
 									<AvatarFallback>
 										{project.author.name
@@ -270,31 +397,36 @@ const isSuperAdmin = roleId === 1;
 											.join("")}
 									</AvatarFallback>
 								</Avatar>
-
-								<div className="flex-1">
-									<h3 className="text-lg font-semibold">
-										{project.author.name}
-									</h3>
-									<p className="text-muted-foreground">
+								<div className="min-w-0 flex-1">
+									<h3 className="text-base font-semibold">{project.author.name}</h3>
+									<p className="text-muted-foreground text-sm truncate">
 										{project.author.email}
 									</p>
-									<p className="text-sm text-muted-foreground mt-1">
+									<p className="text-xs text-muted-foreground mt-1">
 										Member since {safeFormatDate(project.author.joinDate)}
 									</p>
+									<Badge variant="outline" className="mt-2 text-green-600 border-green-600">
+										{project.author.accountStatus}
+									</Badge>
 								</div>
 							</div>
 						</CardContent>
 					</Card>
 
-					{/* OTHER MANUSCRIPTS */}
-					<Card className="mt-6">
-						<CardHeader>
-							<CardTitle>Other Manuscripts by {project.author.name}</CardTitle>
+					{/* Other Manuscripts Card */}
+					<Card>
+						<CardHeader className="pb-3">
+							<CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+								<BookOpen className="h-4 w-4" />
+								Other Manuscripts by {project.author.name}
+								<span className="ml-auto text-sm font-normal text-muted-foreground">
+									{project.otherManuscripts.length} total
+								</span>
+							</CardTitle>
 						</CardHeader>
-
 						<CardContent>
 							{project.otherManuscripts.length === 0 ? (
-								<p className="text-muted-foreground">
+								<p className="text-muted-foreground text-sm">
 									No other manuscripts as of now.
 								</p>
 							) : (
@@ -302,17 +434,15 @@ const isSuperAdmin = roleId === 1;
 									{project.otherManuscripts.map((m: any) => (
 										<div
 											key={m.id}
-											className="flex items-center justify-between p-3 border rounded-lg"
+											className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/40 transition-colors gap-3"
 										>
-											<div>
-												<h4 className="font-medium">{m.title}</h4>
-												<p className="text-sm text-muted-foreground">
+											<div className="min-w-0">
+												<h4 className="font-medium text-sm truncate">{m.title}</h4>
+												<p className="text-xs text-muted-foreground mt-0.5">
 													Submitted {safeFormatDate(m.created_at)}
 												</p>
 											</div>
-
-											{/* Reuse your existing badge function */}
-											{getStatusBadge(m.status)}
+											<div className="shrink-0">{getStatusBadge(m.status)}</div>
 										</div>
 									))}
 								</div>
@@ -321,75 +451,99 @@ const isSuperAdmin = roleId === 1;
 					</Card>
 				</TabsContent>
 
-				{/* EDITORS TAB */}
+				{/* ── Editors Tab ── */}
 				<TabsContent value="editors">
 					<Card>
-						<CardHeader>
-							<CardTitle>Assigned Editor</CardTitle>
+						<CardHeader className="pb-3">
+							<CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+								<UserCheck className="h-4 w-4" />
+								Assigned Editor
+							</CardTitle>
 						</CardHeader>
+						<CardContent className="space-y-5">
+							{/* No editor assigned */}
+							{!project.assignedEditor && (
+								<div className="flex items-center gap-2 text-muted-foreground text-sm p-3 bg-muted/40 rounded-lg">
+									<UserCheck className="h-4 w-4 shrink-0" />
+									No editor assigned yet.
+								</div>
+							)}
 
-						<CardContent>
-							{project.assignedEditor ? (
-								<>
-									<div className="flex items-start gap-4 mb-6">
-										<Avatar className="h-12 w-12">
-											<AvatarImage src={project.assignedEditor.avatar} />
-											<AvatarFallback>
-												{project.assignedEditor.name
-													.split(" ")
-													.map((n: string) => n[0])
-													.join("")}
-											</AvatarFallback>
-										</Avatar>
-
-										<div className="flex-1">
-											<h3 className="font-semibold">
-												{project.assignedEditor.name}
-											</h3>
-											<p className="text-sm text-muted-foreground">
-												{project.assignedEditor.email}
-											</p>
-											<Badge variant="outline" className="mt-2">
-												{project.assignedEditor.role}
-											</Badge>
-										</div>
+							{/* Current editor */}
+							{project.assignedEditor && (
+								<div className="flex items-start gap-4 p-4 border rounded-lg bg-muted/20">
+									<Avatar className="h-11 w-11 shrink-0">
+										<AvatarImage src={project.assignedEditor.avatar} />
+										<AvatarFallback>
+											{project.assignedEditor.name
+												.split(" ")
+												.map((n: string) => n[0])
+												.join("")}
+										</AvatarFallback>
+									</Avatar>
+									<div className="min-w-0 flex-1">
+										<h3 className="font-semibold text-sm">
+											{project.assignedEditor.name}
+										</h3>
+										<p className="text-xs text-muted-foreground truncate">
+											{project.assignedEditor.email}
+										</p>
+										<Badge variant="outline" className="mt-2 text-xs">
+											{project.assignedEditor.role}
+										</Badge>
 									</div>
+								</div>
+							)}
 
-									{isSuperAdmin && (
-  <>
-    <Label>Reassign Editor</Label>
-    <div className="flex gap-2 mt-2">
-      <Select value={selectedEditor} onValueChange={setSelectedEditor}>
-        <SelectTrigger className="flex-1">
-          <SelectValue />
-        </SelectTrigger>
+							{/* Super admin: assign/reassign */}
+							{isSuperAdmin && isInEditing && (
+								<div className="space-y-2 pt-2 border-t">
+									<Label className="text-sm font-medium">
+										{project.assignedEditor ? "Reassign Editor" : "Assign Editor"}
+									</Label>
+									<div className="flex flex-col sm:flex-row gap-2 mt-1">
+										<Select
+											value={selectedEditor}
+											onValueChange={setSelectedEditor}
+										>
+											<SelectTrigger className="flex-1">
+												<SelectValue placeholder="Choose an editor" />
+											</SelectTrigger>
+											<SelectContent>
+												{apiEditors.map((editor) => (
+													<SelectItem
+														key={editor.id}
+														value={editor.id.toString()}
+													>
+														{editor.name} — {editor.admin_role?.name}
+													</SelectItem>
+												))}
+											</SelectContent>
+										</Select>
+										<Button
+											onClick={handleAssignProject}
+											className="flex items-center justify-center gap-1.5 sm:w-auto w-full"
+										>
+											<UserCheck className="h-4 w-4" />
+											Save
+										</Button>
+									</div>
+								</div>
+							)}
 
-        <SelectContent className="bg-popover border z-50">
-          <SelectItem value={project.assignedEditor.name}>
-            {project.assignedEditor.name}
-          </SelectItem>
-        </SelectContent>
-      </Select>
+							{/* Non super admin read-only note */}
+							{!isSuperAdmin && project.assignedEditor && (
+								<p className="text-xs text-muted-foreground">
+									You cannot modify editor assignment.
+								</p>
+							)}
 
-      <Button
-        variant="outline"
-        onClick={() =>
-          toast({
-            title: "Editor reassigned",
-            description: `Assigned to ${selectedEditor}`,
-          })
-        }
-      >
-        <UserCheck className="h-4 w-4 mr-1" />
-        Reassign
-      </Button>
-    </div>
-  </>
-)}
-
-								</>
-							) : (
-								<p className="text-muted-foreground">No editor assigned yet.</p>
+							{/* In-editing note for super admin when not in-editing */}
+							{isSuperAdmin && !isInEditing && (
+								<p className="text-xs text-muted-foreground">
+									Editor assignment is only available when the project is{" "}
+									<span className="font-medium">In Editing</span>.
+								</p>
 							)}
 						</CardContent>
 					</Card>

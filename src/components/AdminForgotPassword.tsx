@@ -168,7 +168,7 @@ setToken(res.data.data.token);
                 <Button
                   variant="ghost"
                   className="w-full text-primary"
-                  onClick={() => (window.location.href = "/admin")}
+                  onClick={() => (window.location.href = "/")}
                 >
                   Back to Login
                 </Button>

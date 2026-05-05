@@ -15,6 +15,8 @@ import {
   TrendingUp,
   Activity,
 } from "lucide-react";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 import { GetAdminDashboardAPI } from "@/services/Api/AdminDashboardApi";
 import { useToast } from "@/hooks/use-toast";
@@ -77,6 +79,32 @@ const Dashboard = () => {
       setLoading(false);
     }
   };
+
+const handleDownloadCSV = () => {
+  const rows = [
+    ["Metric", "Value"],
+    ["Total Manuscripts", dashboard?.totalSubmitted?.value || 0],
+    ["In Progress", dashboard?.inProgress?.value || 0],
+    ["Completed", dashboard?.completed?.value || 0],
+    ["Total Users", dashboard?.totalUsers?.value || 0],
+  ];
+
+  // Convert to CSV string
+  const csvContent = rows.map((e) => e.join(",")).join("\n");
+
+  // Create blob
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+
+  // Create download link
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.setAttribute("download", "dashboard-stats.csv");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
 
   const handleQuickLinkClick = (path: string) => navigate(path);
   const handleActivityClick = (path: string) => navigate(path);
@@ -173,12 +201,18 @@ const Dashboard = () => {
   return (
     <div className="space-y-6">
       {/* TITLE */}
-      <div>
-        <h1 className="text-3xl font-bold">Dashboard</h1>
-        <p className="text-muted-foreground mt-2">
-          Welcome to the Turning Pages Admin Panel
-        </p>
-      </div>
+     <div className="flex justify-between items-center">
+  <div>
+    <h1 className="text-3xl font-bold">Dashboard</h1>
+    <p className="text-muted-foreground mt-2">
+      Welcome to the Turning Pages Admin Panel
+    </p>
+  </div>
+
+<Button onClick={handleDownloadCSV}>
+  Download Stats
+</Button>
+</div>
 
       {/* KPI CARDS */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -196,7 +230,7 @@ const Dashboard = () => {
             <CardContent>
               <div className="text-2xl font-bold">{kpi.value}</div>
 
-              <div className="flex items-center text-xs mt-1">
+              {/* <div className="flex items-center text-xs mt-1">
                 <TrendingUp
                   className={`mr-1 h-3 w-3 ${
                     kpi.trendUp ? "text-green-600" : "text-red-600 rotate-180"
@@ -208,7 +242,7 @@ const Dashboard = () => {
                 <span className="ml-1 text-muted-foreground">
                   {kpi.description}
                 </span>
-              </div>
+              </div> */}
             </CardContent>
           </Card>
         ))}

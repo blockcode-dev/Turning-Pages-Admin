@@ -1,0 +1,575 @@
+// ════════════════════════════════════════════════════════
+// PdfViewer.scss  —  Editorial Light Theme
+// Matches the CKEditor host app UI (navy header, white body)
+// ════════════════════════════════════════════════════════
+
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+// ── Tokens ──────────────────────────────────────────────
+$navy:          #1a2f4a;
+$navy-dark:     #0f1e30;
+$navy-mid:      #243854;
+$accent:        #2f6fbf;
+$accent-light:  #e8f0fb;
+$gold:          #c8973a;
+
+$page-bg:       #ffffff;
+$canvas-bg:     #e8e8e8;   // classic print-preview grey
+$toolbar-bg:    #f5f5f5;
+$border:        #d4d4d4;
+
+$text-ink:      #1a1a1a;
+$text-mid:      #555;
+$text-muted:    #999;
+
+$font-ui:       'DM Sans',  sans-serif;
+$font-body:     'Lora',     Georgia, serif;
+$font-mono:     'DM Mono',  monospace;
+
+$r-sm:          5px;
+$r-md:          8px;
+$ease:          cubic-bezier(.4, 0, .2, 1);
+$t:             0.16s $ease;
+
+// ── Root ────────────────────────────────────────────────
+.pdv {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+  font-family: $font-ui;
+  overflow: hidden;
+  background: $canvas-bg;
+}
+
+// ── Header ──────────────────────────────────────────────
+.pdv__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 52px;
+  padding: 0 18px;
+  background: $navy;
+  flex-shrink: 0;
+  gap: 12px;
+}
+
+.pdv__hl,
+.pdv__hr {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.pdv__hr { justify-content: flex-end; }
+
+.pdv__hc {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pdv__back {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: $r-sm;
+  color: rgba(255,255,255,0.85);
+  font-family: $font-ui;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: $t;
+
+  &:hover {
+    background: rgba(255,255,255,0.14);
+    color: #fff;
+  }
+
+  &:active { transform: scale(0.96); }
+}
+
+.pdv__header-divider {
+  width: 1px;
+  height: 18px;
+  background: rgba(255,255,255,0.15);
+}
+
+.pdv__doc-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: rgba(255,255,255,0.7);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+
+  svg { opacity: 0.65; }
+  span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 260px;
+    color: rgba(255,255,255,0.9);
+  }
+}
+
+.pdv__badge {
+  padding: 3px 10px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.65);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.pdv__action {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: $r-sm;
+  color: rgba(255,255,255,0.75);
+  font-family: $font-ui;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: $t;
+
+  &:hover {
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+  }
+}
+
+// ── Toolbar ─────────────────────────────────────────────
+.pdv__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 42px;
+  gap: 4px;
+  background: $toolbar-bg;
+  border-bottom: 1px solid $border;
+  flex-shrink: 0;
+  padding: 0 16px;
+}
+
+.pdv__tb-sep {
+  width: 1px;
+  height: 18px;
+  background: $border;
+  margin: 0 6px;
+}
+
+.pdv__tb-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: 1px solid $border;
+  border-radius: $r-sm;
+  color: $text-mid;
+  cursor: pointer;
+  transition: $t;
+
+  &:hover:not(:disabled) {
+    background: #eaeaea;
+    border-color: #bbb;
+    color: $text-ink;
+  }
+
+  &:active:not(:disabled) { transform: scale(0.92); }
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+}
+
+// Pagination control
+.pdv__nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pdv__pager {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.pdv__pg-input {
+  width: 38px;
+  height: 26px;
+  padding: 0 4px;
+  background: #fff;
+  border: 1px solid $border;
+  border-radius: $r-sm;
+  font-family: $font-mono;
+  font-size: 12px;
+  text-align: center;
+  color: $text-ink;
+  transition: $t;
+
+  &:focus {
+    outline: none;
+    border-color: $accent;
+    box-shadow: 0 0 0 2px rgba(47, 111, 191, 0.12);
+  }
+
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button { -webkit-appearance: none; }
+  -moz-appearance: textfield;
+}
+
+.pdv__pg-of {
+  font-size: 12px;
+  color: $text-muted;
+  font-family: $font-mono;
+}
+
+// Zoom
+.pdv__zoom {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pdv__zoom-pct {
+  min-width: 46px;
+  height: 26px;
+  padding: 0 8px;
+  background: #fff;
+  border: 1px solid $border;
+  border-radius: $r-sm;
+  font-family: $font-mono;
+  font-size: 11.5px;
+  color: $text-mid;
+  cursor: pointer;
+  transition: $t;
+  text-align: center;
+
+  &:hover {
+    border-color: #bbb;
+    color: $text-ink;
+  }
+}
+
+// Page dots
+.pdv__dots {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  max-width: 200px;
+  overflow-x: auto;
+  padding: 2px 0;
+
+  &::-webkit-scrollbar { display: none; }
+}
+
+.pdv__dot {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 1px solid $border;
+  background: #fff;
+  font-size: 9px;
+  font-family: $font-mono;
+  color: $text-muted;
+  cursor: pointer;
+  transition: $t;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover { background: $accent-light; border-color: $accent; color: $accent; }
+
+  &--on {
+    background: $navy;
+    border-color: $navy;
+    color: #fff;
+  }
+}
+
+// ── Canvas ──────────────────────────────────────────────
+.pdv__canvas {
+  flex: 1;
+  overflow: auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 24px 60px;
+  position: relative;
+
+  // Subtle grid pattern — classic print-preview feel
+  background-color: #d8d8d8;
+  background-image:
+    linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
+  background-size: 20px 20px;
+
+  &::-webkit-scrollbar { width: 7px; height: 7px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb {
+    background: #bbb;
+    border-radius: 99px;
+    &:hover { background: #999; }
+  }
+}
+
+// ── Loading ─────────────────────────────────────────────
+.pdv__loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin: auto;
+
+  p {
+    font-size: 13px;
+    color: $text-muted;
+    font-family: $font-ui;
+  }
+}
+
+.pdv__spin-pages {
+  display: flex;
+  gap: 6px;
+  align-items: flex-end;
+}
+
+.pdv__sp {
+  width: 18px;
+  border-radius: 2px;
+  background: $navy;
+  opacity: 0.2;
+  animation: pageStack 1s ease-in-out infinite;
+
+  &--1 { height: 26px; animation-delay: 0s;    }
+  &--2 { height: 22px; animation-delay: 0.15s; }
+  &--3 { height: 28px; animation-delay: 0.3s;  }
+
+  @keyframes pageStack {
+    0%, 100% { opacity: 0.2; transform: scaleY(1);    }
+    50%       { opacity: 0.7; transform: scaleY(1.08); }
+  }
+}
+
+// ── Empty state ─────────────────────────────────────────
+.pdv__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin: auto;
+  text-align: center;
+
+  svg { color: #bbb; }
+  p { font-size: 14px; color: $text-muted; line-height: 1.6; }
+}
+
+// ── Scale wrapper ────────────────────────────────────────
+.pdv__scale-wrap {
+  position: relative;
+  display: inline-block;
+  transition: transform 0.2s $ease;
+}
+
+// Shadow layers for paper depth illusion
+.pdv__paper-shadow {
+  position: absolute;
+  border-radius: 2px;
+  background: rgba(0,0,0,0.12);
+
+  &--1 { inset: 0;      filter: blur(12px); transform: translateY(6px); }
+  &--2 { inset: 2px 4px; filter: blur(4px);  transform: translateY(2px); opacity: 0.6; }
+  &--3 { inset: -1px -2px; filter: blur(1px); transform: translateY(1px); opacity: 0.25; }
+}
+
+// ── A4 Page ──────────────────────────────────────────────
+.pdv__page {
+  position: relative;
+  background: $page-bg;
+  border-radius: 1px;
+  overflow: hidden;
+  animation: pageIn 0.3s $ease forwards;
+
+  @keyframes pageIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0);   }
+  }
+}
+
+// Running head (top of page)
+.pdv__running-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.pdv__running-title {
+  font-family: $font-ui;
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: $text-muted;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.pdv__running-line {
+  flex: 1;
+  height: 0.5px;
+  background: #ddd;
+}
+
+// Body content typography
+.pdv__body {
+  font-family: $font-body;
+  font-size: 13.5px;
+  line-height: 1.85;
+  color: $text-ink;
+  word-break: break-word;
+
+  // Paragraph spacing
+  p {
+    margin: 0 0 1em;
+    text-align: justify;
+    hyphens: auto;
+
+    &:first-child { text-indent: 0; }
+    & + p { text-indent: 1.5em; margin-top: 0; }
+  }
+
+  // Headings
+  h1, h2, h3, h4, h5, h6 {
+    font-family: $font-ui;
+    font-weight: 600;
+    color: $navy;
+    margin: 1.4em 0 0.5em;
+    line-height: 1.3;
+  }
+
+  h1 { font-size: 22px; letter-spacing: -0.02em; }
+  h2 { font-size: 17px; }
+  h3 { font-size: 14px; text-transform: uppercase; letter-spacing: 0.06em; }
+
+  // Italic / bold
+  em    { font-style: italic; }
+  strong { font-weight: 600; }
+
+  // Block quotes
+  blockquote {
+    margin: 1.5em 0;
+    padding: 0.6em 1.4em;
+    border-left: 3px solid $gold;
+    background: #fdf8f0;
+    font-style: italic;
+    color: #444;
+  }
+
+  // Lists
+  ul, ol {
+    padding-left: 1.6em;
+    margin: 0.8em 0;
+    li { margin-bottom: 0.3em; }
+  }
+
+  // Links
+  a { color: $accent; text-underline-offset: 2px; }
+
+  // Code
+  code {
+    font-family: $font-mono;
+    font-size: 12px;
+    background: #f4f4f4;
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+}
+
+// Folio (page number at bottom)
+.pdv__folio {
+  position: absolute;
+  bottom: 28px;
+  left: 72px;
+  right: 72px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pdv__folio-rule {
+  flex: 1;
+  height: 0.5px;
+  background: #ddd;
+}
+
+.pdv__folio-num {
+  font-family: $font-ui;
+  font-size: 10px;
+  color: $text-muted;
+  letter-spacing: 0.06em;
+}
+
+// ── Progress bar ─────────────────────────────────────────
+.pdv__progress {
+  height: 2px;
+  background: #ccc;
+  flex-shrink: 0;
+}
+
+.pdv__progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, $accent, lighten($accent, 15%));
+  border-radius: 0 99px 99px 0;
+  transition: width 0.22s $ease;
+}
+
+// ── Print styles ─────────────────────────────────────────
+@media print {
+  .pdv__header,
+  .pdv__toolbar,
+  .pdv__progress  { display: none !important; }
+
+  .pdv__canvas {
+    padding: 0;
+    background: white;
+    overflow: visible;
+  }
+
+  .pdv__scale-wrap { transform: none !important; }
+  .pdv__paper-shadow { display: none; }
+
+  .pdv__page {
+    width: 210mm !important;
+    min-height: 297mm !important;
+    padding: 19mm !important;
+    box-shadow: none !important;
+    break-after: page;
+  }
+}
+
+// ── Responsive ───────────────────────────────────────────
+@media (max-width: 640px) {
+  .pdv__header { padding: 0 12px; }
+  .pdv__doc-chip span { max-width: 130px; font-size: 12px; }
+  .pdv__canvas { padding: 20px 8px 40px; }
+  .pdv__dots   { display: none; }
+}

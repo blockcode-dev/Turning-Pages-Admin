@@ -15,57 +15,52 @@ const AdminLogin = () => {
 	const [showPassword, setShowPassword] = useState(false);
 	const { toast } = useToast();
 
-	// Dummy credentials
-	const DUMMY_CREDENTIALS = {
-		email: "admin@turningpages.com",
-		password: "admin123",
-	};
-
 	const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+		e.preventDefault();
 
-  try {
-    const res = await AdminLoginAPI(email, password);
+		try {
+			const res = await AdminLoginAPI(email, password);
 
-    if (res.data?.success) {
-      const token = res.data?.data?.token || "";
-      const roleId = res.data?.data?.role_id || null;
+			if (res.data?.success) {
+				const token = res.data?.data?.token || "";
+				const roleId = res.data?.data?.role_id || null;
+				const adminId = res.data?.data?.id || null;
 
-      // Save token & role
-      localStorage.setItem("token", token);
-      localStorage.setItem("role_id", roleId);
+				// Save token & role
+				localStorage.setItem("token", token);
+				localStorage.setItem("role_id", roleId);
+				localStorage.setItem("admin_id", adminId);
 
-      // Determine admin access
-      if (roleId === 1) {
-        localStorage.setItem("isAdmin", "true");
-      } else {
-        localStorage.setItem("isAdmin", "false");
-      }
+				// Determine admin access
+				if (roleId === 1) {
+					localStorage.setItem("isAdmin", "true");
+				} else {
+					localStorage.setItem("isAdmin", "false");
+				}
 
-      toast({
-        title: "Welcome back!",
-        description: "You've successfully logged in.",
-      });
+				toast({
+					title: "Welcome back!",
+					description: "You've successfully logged in.",
+				});
 
-      setTimeout(() => {
-        window.location.href = "/dashboard";
-      }, 500);
-    } else {
-      toast({
-        title: "Login Failed",
-        description: res.data?.message || "Invalid credentials.",
-        variant: "destructive",
-      });
-    }
-  } catch (err: any) {
-    toast({
-      title: "Login Failed",
-      description: err.response?.data?.message || "Something went wrong.",
-      variant: "destructive",
-    });
-  }
-};
-
+				setTimeout(() => {
+					window.location.href = "/dashboard";
+				}, 500);
+			} else {
+				toast({
+					title: "Login Failed",
+					description: res.data?.message || "Invalid credentials.",
+					variant: "destructive",
+				});
+			}
+		} catch (err: any) {
+			toast({
+				title: "Login Failed",
+				description: err.response?.data?.message || "Something went wrong.",
+				variant: "destructive",
+			});
+		}
+	};
 
 	const togglePasswordVisibility = () => {
 		setShowPassword(!showPassword);
@@ -140,14 +135,14 @@ const AdminLogin = () => {
 						</a>
 					</div>
 
-					<div className="mt-4 text-center">
+					{/* <div className="mt-4 text-center">
 						<a
 							href="/"
 							className="text-sm text-muted-foreground hover:text-foreground transition-colors"
 						>
 							Back to User Login
 						</a>
-					</div>
+					</div> */}
 				</CardContent>
 			</Card>
 		</div>

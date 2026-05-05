@@ -36,12 +36,20 @@ export const UpdateEditorStatusAPI = async (payload: { editorId: number; status:
     }
   );
 };
+
 export const AddEditorAPI = (payload: { name: string; email: string; role_id: number; department_id: number }) => {
   const token = localStorage.getItem("token");
 
   return axios.post(`${API_BASE_URL}admin/auth/register`, payload, {
     headers: { "x-access-token": token },
   });
+};
+
+export const DeleteEditorAPI = async (userId: number) => {
+	const token = localStorage.getItem("token");
+	return axios.delete(`${API_BASE_URL}admin/op/editor/${userId}`, {
+		headers: { "x-access-token": token },
+	});
 };
 
 

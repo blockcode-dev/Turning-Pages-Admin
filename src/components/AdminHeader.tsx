@@ -46,15 +46,15 @@ export function AdminHeader() {
 			</div>
 
 			<div className="flex items-center gap-4">
-				<div className="relative w-80">
+				{/* <div className="relative w-80">
 					<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
 					<Input
 						placeholder="Search manuscripts, editors, projects..."
 						className="pl-10"
 					/>
-				</div>
+				</div> */}
 
-				<div className="relative">
+				{/* <div className="relative">
 					<Button variant="ghost" size="icon" className="relative">
 						<Bell className="h-5 w-5" />
 						{notificationCount > 0 && (
@@ -66,7 +66,7 @@ export function AdminHeader() {
 							</Badge>
 						)}
 					</Button>
-				</div>
+				</div> */}
 
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
@@ -104,6 +104,7 @@ export function AdminHeader() {
 								localStorage.removeItem("token");
 								localStorage.removeItem("isAdmin");
 								localStorage.removeItem("role_id");
+								localStorage.removeItem("admin_id");
 
 								// Redirect to homepage
 								window.location.href = "/";

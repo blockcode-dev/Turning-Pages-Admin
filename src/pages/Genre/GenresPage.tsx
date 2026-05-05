@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import "./Genre.scss";
 import {
   Dialog,
   DialogContent,
@@ -11,6 +12,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { ArrowUpDown } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -36,6 +38,8 @@ export default function GenresPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [genreTitle, setGenreTitle] = useState("");
   const [editId, setEditId] = useState<number | null>(null);
+  const [sortField, setSortField] = useState<string>("id");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -134,9 +138,30 @@ export default function GenresPage() {
     }
   };
 
+  const sortedGenres = [...genres].sort((a, b) => {
+    let valA: any;
+    let valB: any;
+
+    switch (sortField) {
+      case "id":
+        valA = a.id;
+        valB = b.id;
+        return sortOrder === "asc" ? valA - valB : valB - valA;
+
+      case "name":
+        valA = a.title || "";
+        valB = b.title || "";
+        return sortOrder === "asc"
+          ? valA.localeCompare(valB)
+          : valB.localeCompare(valA);
+
+      default:
+        return 0;
+    }
+  });
+
   return (
     <div className="max-w-6xl space-y-6">
-
       {/* PAGE HEADER */}
       <div className="flex items-center justify-between">
         <div>
@@ -161,14 +186,48 @@ export default function GenresPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[60px]">ID</TableHead>
-                  <TableHead>Name</TableHead>
-                  <TableHead className="text-right w-[150px]">Actions</TableHead>
+                  <TableHead
+                    onClick={() => {
+                      setSortField("id");
+                      setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+                    }}
+                    className="sortable-th"
+                  >
+                    <div className="flex items-center gap-2">
+                      <ArrowUpDown
+                        size={13}
+                        className={
+                          sortField === "id" ? "opacity-100" : "opacity-40"
+                        }
+                      />
+                      ID
+                    </div>
+                  </TableHead>
+                  <TableHead
+                    onClick={() => {
+                      setSortField("name");
+                      setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+                    }}
+                    className="sortable-th"
+                  >
+                    <div className="flex items-center gap-2">
+                      <ArrowUpDown
+                        size={13}
+                        className={
+                          sortField === "name" ? "opacity-100" : "opacity-40"
+                        }
+                      />
+                      Name
+                    </div>
+                  </TableHead>
+                  <TableHead className="text-right w-[150px]">
+                    Actions
+                  </TableHead>
                 </TableRow>
               </TableHeader>
 
               <TableBody>
-                {genres.map((genre: any, index: number) => (
+                {sortedGenres.map((genre: any, index: number) => (
                   <TableRow key={genre.id} className="h-12">
                     <TableCell className="py-3">{index + 1}</TableCell>
 
