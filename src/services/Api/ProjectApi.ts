@@ -63,4 +63,10 @@ export const UpdateBookCoverAPI = (payload: {
   );
 };
 
+export const RunTavAnalysisAPI = (bookId: number) => {
+	return axios.post(`${API_BASE_URL}/tav/run-analysis`, {
+		book_id: bookId,
+	});
+};
+
 

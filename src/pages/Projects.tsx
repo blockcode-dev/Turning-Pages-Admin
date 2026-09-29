@@ -36,6 +36,7 @@ import {
 	ChevronLeft,
 	ChevronRight,
 	X,
+	Sparkles,
 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -100,12 +101,14 @@ const ProjectCard = ({
 	currentPage,
 	itemsPerPage,
 	onOpen,
+	onRunTav,
 }: {
 	project: any;
 	index: number;
 	currentPage: number;
 	itemsPerPage: number;
 	onOpen: (id: number) => void;
+	onRunTav: (id: number) => void;
 }) => (
 	<div className="rounded-xl border bg-card shadow-sm p-4 space-y-3 hover:shadow-md transition-shadow">
 		{/* Row 1: Sr.No + Title + Status */}
@@ -148,7 +151,7 @@ const ProjectCard = ({
 			</div>
 		</div>
 
-		{/* Row 3: Editor + Action */}
+		{/* Row 3: Editor + Actions */}
 		<div className="flex items-center justify-between gap-2 pt-1 border-t">
 			<div className="min-w-0">
 				<span className="text-xs text-muted-foreground block">Editor</span>
@@ -160,15 +163,26 @@ const ProjectCard = ({
 					</span>
 				)}
 			</div>
-			<Button
-				variant="outline"
-				size="sm"
-				onClick={() => onOpen(project.id)}
-				className="shrink-0 flex items-center gap-1.5"
-			>
-				<Eye className="h-3.5 w-3.5" />
-				Open
-			</Button>
+			<div className="flex items-center gap-1.5 shrink-0">
+				<Button
+					variant="outline"
+					size="sm"
+					onClick={() => onRunTav(project.id)}
+					className="flex items-center gap-1.5"
+				>
+					<Sparkles className="h-3.5 w-3.5" />
+					Run TAV
+				</Button>
+				<Button
+					variant="outline"
+					size="sm"
+					onClick={() => onOpen(project.id)}
+					className="flex items-center gap-1.5"
+				>
+					<Eye className="h-3.5 w-3.5" />
+					Open
+				</Button>
+			</div>
 		</div>
 	</div>
 );
@@ -242,14 +256,25 @@ const Projects = () => {
 	};
 
 	const loadEditors = async () => {
-		try {
-			const res = await GetAllEditorsAPI();
-			const names = (res.data.data || []).map((e: any) => e.name);
-			setEditorOptions(["All Editors", ...names]);
-		} catch (error) {
-			console.error("Failed to load editors", error);
-		}
-	};
+  try {
+    const res = await GetAllEditorsAPI();
+    const names = (res.data.data || []).map((e: any) => e.name);
+    setEditorOptions(["All Editors", ...names]);
+  } catch (err: any) {
+    if (
+      err.response?.data?.message ===
+      "You are not authorized to access this route"
+    ) {
+      return navigate("/unauthorized");
+    }
+
+    toast({
+      title: "Failed to load editors",
+      description: err.response?.data?.message || "Something went wrong",
+      variant: "destructive",
+    });
+  }
+};
 
 	useEffect(() => {
 		loadProjects();
@@ -314,6 +339,13 @@ const Projects = () => {
 
 	const handleOpenProject = (projectId: number) => {
 		navigate(`/project-details?id=${projectId}`);
+	};
+
+	// Navigate to the dedicated TAV results page. The actual (slow) API call
+	// happens on that page, not here - this keeps the Projects list responsive
+	// instead of blocking it for 60+ seconds.
+	const handleRunTav = (projectId: number) => {
+		navigate(`/tav-analysis?id=${projectId}`);
 	};
 
 	const clearFilters = () => {
@@ -585,6 +617,7 @@ const Projects = () => {
 							currentPage={currentPage}
 							itemsPerPage={itemsPerPage}
 							onOpen={handleOpenProject}
+							onRunTav={handleRunTav}
 						/>
 					))
 				) : (
@@ -641,7 +674,7 @@ const Projects = () => {
 										</div>
 									</TableHead>
 									<TableHead className="min-w-[150px]">Editor</TableHead>
-									<TableHead className="min-w-[110px]">Action</TableHead>
+									<TableHead className="min-w-[220px]">Action</TableHead>
 								</TableRow>
 							</TableHeader>
 							<TableBody>
@@ -679,15 +712,26 @@ const Projects = () => {
 												)}
 											</TableCell>
 											<TableCell>
-												<Button
-													variant="outline"
-													size="sm"
-													onClick={() => handleOpenProject(project.id)}
-													className="flex items-center gap-1.5 h-8"
-												>
-													<Eye className="h-3.5 w-3.5" />
-													Open
-												</Button>
+												<div className="flex items-center gap-1.5">
+													<Button
+														variant="outline"
+														size="sm"
+														onClick={() => handleRunTav(project.id)}
+														className="flex items-center gap-1.5 h-8"
+													>
+														<Sparkles className="h-3.5 w-3.5" />
+														Run TAV
+													</Button>
+													<Button
+														variant="outline"
+														size="sm"
+														onClick={() => handleOpenProject(project.id)}
+														className="flex items-center gap-1.5 h-8"
+													>
+														<Eye className="h-3.5 w-3.5" />
+														Open
+													</Button>
+												</div>
 											</TableCell>
 										</TableRow>
 									))

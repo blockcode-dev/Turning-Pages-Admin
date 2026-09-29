@@ -643,7 +643,7 @@ const Editors = () => {
             <div>
               <h2 className="delete-title">Delete Editor</h2>
               <p className="delete-sub">
-                This will deactivate the editor account
+                This will delete the editor account
               </p>
             </div>
           </div>

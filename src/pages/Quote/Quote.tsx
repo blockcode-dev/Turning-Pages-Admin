@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Papa from "papaparse";
-import "./Quote.scss"
+import "./Quote.scss";
 import {
   Table,
   TableBody,
@@ -551,6 +551,11 @@ Jane Smith,"Stay strong and keep going.","Success|Growth"`}
               <h3 className="font-semibold mb-2">📌 Rules</h3>
 
               <ul className="text-sm space-y-2 leading-relaxed">
+                <li>
+                  • The CSV file must include the header row exactly as:
+                  author,quote,tags.
+                </li>
+                <li> • Do not rename or remove any column headers</li>
                 <li>
                   • <strong>author</strong> → Name of the author
                 </li>

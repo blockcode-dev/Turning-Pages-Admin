@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
+import { useNavigate } from "react-router-dom";
 import {
   Select,
   SelectContent,
@@ -69,6 +70,7 @@ const Users = () => {
   const [deleteUser, setDeleteUser] = useState<any>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadUsers();
@@ -193,35 +195,61 @@ const Users = () => {
       setCreditAmount("");
       const res = await GetUserDetailsAPI(selectedUser.id);
       setSelectedUser(res.data.data);
-    } catch {
-      toast({ title: "Failed to add credits", variant: "destructive" });
-    } finally {
-      setCreditLoading(false);
+    } catch (err: any) {
+    if (
+      err.response?.data?.message ===
+      "You are not authorized to access this route"
+    ) {
+      return navigate("/unauthorized");
     }
+
+    toast({
+      title: "Failed to add credits",
+      description: err.response?.data?.message || "Something went wrong",
+      variant: "destructive",
+    });
+  } finally {
+    setCreditLoading(false);
+  }
   };
 
-  const handleReduceCredits = async () => {
-    if (!selectedUser?.id || !reduceCreditAmount) {
-      toast({ title: "Enter valid credit amount", variant: "destructive" });
-      return;
+ const handleReduceCredits = async () => {
+  if (!selectedUser?.id || !reduceCreditAmount) {
+    toast({ title: "Enter valid credit amount", variant: "destructive" });
+    return;
+  }
+
+  try {
+    setReduceCreditLoading(true);
+
+    await AddUserCreditsAPI({
+      user_id: selectedUser.id,
+      credit: Number(reduceCreditAmount),
+      action: "reduce",
+    });
+
+    toast({ title: "Credits reduced successfully 💸" });
+    setReduceCreditAmount("");
+
+    const res = await GetUserDetailsAPI(selectedUser.id);
+    setSelectedUser(res.data.data);
+  } catch (err: any) {
+    if (
+      err.response?.data?.message ===
+      "You are not authorized to access this route"
+    ) {
+      return navigate("/unauthorized");
     }
-    try {
-      setReduceCreditLoading(true);
-      await AddUserCreditsAPI({
-        user_id: selectedUser.id,
-        credit: Number(reduceCreditAmount),
-        action: "reduce",
-      });
-      toast({ title: "Credits reduced successfully 💸" });
-      setReduceCreditAmount("");
-      const res = await GetUserDetailsAPI(selectedUser.id);
-      setSelectedUser(res.data.data);
-    } catch {
-      toast({ title: "Failed to reduce credits", variant: "destructive" });
-    } finally {
-      setReduceCreditLoading(false);
-    }
-  };
+
+    toast({
+      title: "Failed to reduce credits",
+      description: err.response?.data?.message || "Something went wrong",
+      variant: "destructive",
+    });
+  } finally {
+    setReduceCreditLoading(false);
+  }
+};
 
   const getInitials = (name: string) =>
     name
@@ -613,7 +641,7 @@ const Users = () => {
                 </div>
 
                 <div className="quick-credits">
-                  {[10, 25, 50, 100].map((amt) => (
+                  {[50, 120, 250, 500].map((amt) => (
                     <button
                       key={amt}
                       className={`quick-credit-btn ${creditAmount === String(amt) ? "selected" : ""}`}
@@ -658,7 +686,7 @@ const Users = () => {
                 </div>
 
                 <div className="quick-credits">
-                  {[10, 25, 50, 100].map((amt) => (
+                  {[50, 120, 250, 500].map((amt) => (
                     <button
                       key={amt}
                       className={`quick-credit-btn quick-credit-btn--reduce ${reduceCreditAmount === String(amt) ? "selected" : ""}`}
@@ -733,7 +761,7 @@ const Users = () => {
               )}
 
               {/* ACCOUNT ACTIONS */}
-              <div className="modal-actions">
+              {/* <div className="modal-actions">
                 <button
                   className="modal-action-btn modal-action-deactivate"
                   onClick={() => {
@@ -750,7 +778,7 @@ const Users = () => {
                     ? "Deactivate Account"
                     : "Activate Account"}
                 </button>
-              </div>
+              </div> */}
             </div>
           )}
         </DialogContent>
@@ -766,7 +794,7 @@ const Users = () => {
             <div>
               <h2 className="delete-title">Delete User</h2>
               <p className="delete-sub">
-                This action will deactivate the account
+                 This action will permanently delete the account and all associated data.
               </p>
             </div>
           </div>

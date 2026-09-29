@@ -35,6 +35,8 @@ import FeedsPage from "./pages/Feed/FeedsPage";
 import TicketsPage from "./pages/Ticket/TicketPage";
 import Chat from "./pages/Chat/Chat";
 import SubscriptionPage from "./pages/SubscriptionListPage";
+import TavTest from "./pages/TavTest";
+import TavAnalysisPage from "./pages/Tavanalysispage";
 
 const queryClient = new QueryClient();
 
@@ -53,6 +55,21 @@ const App = () => (
               <Dashboard />
             </AdminLayout>
           } />
+
+           <Route path="/tav-test" element={
+            <AdminLayout>
+              <TavTest />
+            </AdminLayout>
+          } />
+
+           <Route path="/tav-analysis" element={
+            <AdminLayout>
+              <TavAnalysisPage />
+            </AdminLayout>
+          } />
+
+
+
 
 
           <Route path="/change-password" element={
