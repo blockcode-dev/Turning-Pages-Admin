@@ -30,7 +30,7 @@ import {
   UpdateBookCoverAPI,
 } from "@/services/Api/ProjectApi";
 
-const IMAGE_BASE_URL = "https://api.turningpages.io:9090/images";
+const IMAGE_BASE_URL = "https://api.turningpages.io/images";
 const sizes = ["512x512", "768x1024", "1024x1024"];
 
 const CoverGenerator = () => {

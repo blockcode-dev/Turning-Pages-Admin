@@ -103,7 +103,7 @@ export default function FeedViewPage() {
 					{/* IMAGE */}
 					{feed.img_uri && (
 						<img
-							src={`https://api.turningpages.io:9090/images/${feed.img_uri}`}
+							src={`https://api.turningpages.io/images/${feed.img_uri}`}
 							className="rounded-xl w-full h-[220px] object-cover"
 						/>
 					)}

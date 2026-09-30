@@ -14,7 +14,7 @@ export default function GrammarAssistant({ text, setText, token }) {
 
     try {
       const res = await fetch(
-        "https://api.turningpages.io:9090/api/v1/grammar/check",
+        "https://api.turningpages.io/api/v1/grammar/check",
         {
           method: "POST",
           headers: {

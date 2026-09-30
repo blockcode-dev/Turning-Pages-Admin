@@ -125,7 +125,7 @@ export default function TavTest() {
       setError(null);
 
       const res = await axios.post(
-        "https://api.turningpages.io:9090/api/v1/tav/run-analysis",
+        "https://api.turningpages.io/api/v1/tav/run-analysis",
         {
           book_id: 33,
         },
