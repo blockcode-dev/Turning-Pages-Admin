@@ -1,0 +1,493 @@
+/* AddUser.scss — matches Users.scss tokens */
+
+$ink: #1A1A1A;
+$ink-2: #444;
+$ink-3: #666;
+$muted: #999;
+$border: #EBEBEA;
+$border-input: #E2E2DE;
+$bg: #F7F7F5;
+$bg-soft: #FAFAF8;
+$gold: #C9A84C;
+$gold-text: #8B6914;
+$gold-soft: #FFFBEE;
+$gold-tint: #F0EBD8;
+$green: #1A8A54;
+$green-soft: #EAFAF2;
+$green-border: #C0EDD8;
+$red: #C0392B;
+
+.add-user-root {
+  padding: 28px 32px 48px;
+  background: $bg;
+  min-height: 100vh;
+  font-family: "DM Sans", sans-serif;
+  color: $ink;
+
+  .spin { animation: au-spin 0.7s linear infinite; }
+
+  button:focus-visible {
+    outline: 2px solid $gold;
+    outline-offset: 2px;
+  }
+
+  @media (max-width: 640px) { padding: 20px 16px 40px; }
+}
+
+@keyframes au-spin { to { transform: rotate(360deg); } }
+
+.au-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px 0 8px;
+  margin-bottom: 18px;
+  border: 1px solid $border;
+  border-radius: 8px;
+  background: #fff;
+  color: #555;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover { background: #F5F5F2; border-color: #ccc; }
+}
+
+/* ── One card, two panes ── */
+.au-layout {
+  max-width: 940px;
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  background: #fff;
+  border: 1px solid $border;
+  border-radius: 14px;
+  overflow: hidden;
+
+  @media (max-width: 820px) { grid-template-columns: 1fr; }
+}
+
+/* Left pane — same gradient as the profile modal hero */
+.au-intro {
+  padding: 32px 28px;
+  background: linear-gradient(135deg, #FFFBEE 0%, #FFF8F0 50%, #F7F5FF 100%);
+  border-right: 1px solid #F0F0EC;
+
+  @media (max-width: 820px) {
+    border-right: none;
+    border-bottom: 1px solid #F0F0EC;
+    padding: 24px 20px;
+  }
+
+  &-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    background: #fff;
+    color: $gold-text;
+    border: 1px solid $gold-tint;
+    margin-bottom: 18px;
+  }
+}
+
+.au-title {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  color: $ink;
+  margin: 0 0 6px;
+}
+
+.au-sub {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: #888;
+  margin: 0 0 28px;
+}
+
+.au-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: 11px;
+    top: 24px;
+    height: 16px;
+    width: 1.5px;
+    background: $gold-tint;
+  }
+}
+
+.au-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: $muted;
+
+  &-dot {
+    position: relative;
+    z-index: 1;
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: #fff;
+    border: 1px solid $border-input;
+    font-size: 11.5px;
+    font-weight: 600;
+  }
+
+  &.is-current {
+    color: $ink;
+    font-weight: 600;
+    .au-step-dot { border-color: $gold; color: $gold-text; background: $gold-soft; }
+  }
+
+  &.is-done .au-step-dot {
+    background: $gold;
+    border-color: $gold;
+    color: #fff;
+  }
+}
+
+/* Right pane */
+.au-panel {
+  padding: 32px 36px;
+
+  @media (max-width: 640px) { padding: 22px 18px; }
+}
+
+.au-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.au-field label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: $ink-2;
+  margin-bottom: 7px;
+}
+
+.au-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  input {
+    width: 100%;
+    height: 40px;
+    padding: 0 12px 0 36px;
+    border-radius: 9px;
+    border: 1px solid $border-input;
+    background: #fff;
+    font-family: inherit;
+    font-size: 13.5px;
+    color: $ink;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+
+    &::placeholder { color: #bbb; }
+    &:focus {
+      border-color: $gold;
+      box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.1);
+    }
+  }
+
+  &.has-error input {
+    border-color: #F5C6C0;
+    background: #FFFAF9;
+    &:focus { border-color: $red; box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.08); }
+  }
+}
+
+.au-input-icon {
+  position: absolute;
+  left: 12px;
+  color: #aaa;
+  pointer-events: none;
+}
+
+.au-error {
+  margin: 6px 0 0;
+  font-size: 12.5px;
+  color: $red;
+}
+
+.au-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 9px;
+  background: $bg-soft;
+  border: 1px solid #F0F0EC;
+  font-size: 12.5px;
+  color: #888;
+
+  svg { color: $gold; flex-shrink: 0; }
+}
+
+/* Buttons */
+.au-btn-primary,
+.au-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 40px;
+  padding: 0 18px;
+  border-radius: 9px;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.au-btn-primary {
+  border: none;
+  background: $ink;
+  color: #fff;
+
+  &:hover:not(:disabled) { background: #333; }
+  &:disabled { opacity: 0.65; cursor: not-allowed; }
+}
+
+.au-form .au-btn-primary { margin-top: 4px; }
+
+.au-btn-ghost {
+  border: 1px solid $border-input;
+  background: #fff;
+  color: $ink-2;
+
+  &:hover { background: #F5F5F2; border-color: #ccc; }
+}
+
+/* ── Result ── */
+.au-result {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.au-slip {
+  border: 1px solid $border;
+  border-radius: 12px;
+  background: #fff;
+  padding: 18px 18px 16px;
+  animation: au-slip-in 0.3s ease-out;
+
+  @media (prefers-reduced-motion: reduce) { animation: none; }
+}
+
+@keyframes au-slip-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+
+.au-slip-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Same as .avatar-fallback on the Users table */
+.au-slip-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: $gold-tint;
+  color: $gold-text;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.au-slip-name {
+  font-size: 15.5px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  margin-bottom: 4px;
+}
+
+/* Same as .badge-active */
+.au-slip-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 9px;
+  border-radius: 20px;
+  background: $green-soft;
+  border: 1px solid $green-border;
+  color: $green;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.au-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: $green;
+}
+
+/* Perforated tear line */
+.au-slip-perf {
+  position: relative;
+  height: 1px;
+  margin: 16px -18px 12px;
+  background-image: linear-gradient(90deg, #DDDDD8 50%, transparent 50%);
+  background-size: 8px 1px;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    top: -8px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #fff;
+    border: 1px solid $border;
+  }
+  &::before { left: -9px; clip-path: inset(0 0 0 50%); }
+  &::after { right: -9px; clip-path: inset(0 50% 0 0); }
+}
+
+.au-cred {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: $bg-soft;
+  border: 1px solid #F0F0EC;
+
+  & + & { margin-top: 8px; }
+}
+
+.au-cred-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: $muted;
+  margin-bottom: 4px;
+}
+
+.au-cred-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.au-cred-value {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: $ink;
+  overflow-wrap: anywhere;
+
+  &--pw {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 14.5px;
+    letter-spacing: 0.05em;
+  }
+}
+
+/* Same shape as .btn-view */
+.au-copy,
+.au-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  height: 30px;
+  border-radius: 7px;
+  border: 1px solid $border-input;
+  background: #fff;
+  color: $ink-2;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s;
+
+  &:hover { background: #F5F5F2; border-color: #ccc; }
+}
+
+.au-copy { min-width: 76px; padding: 0 11px; }
+.au-icon-btn { width: 30px; color: #888; }
+
+.au-copy.is-copied,
+.au-copy-all.is-copied {
+  background: $green-soft;
+  border-color: $green-border;
+  color: $green;
+}
+
+.au-copy-all {
+  width: 100%;
+  margin-top: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 38px;
+  border: 1px dashed #D6D6D2;
+  border-radius: 9px;
+  background: #fff;
+  color: #555;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover { border-color: $gold; color: $gold-text; background: $gold-soft; }
+}
+
+/* Same as .delete-warning-box */
+.au-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  background: #FEF3C7;
+  color: #92400E;
+  font-size: 12.5px;
+  line-height: 1.5;
+
+  svg { flex-shrink: 0; margin-top: 2px; }
+}
+
+.au-result-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-top: 4px;
+
+  @media (max-width: 560px) {
+    flex-direction: column-reverse;
+    button { width: 100%; }
+  }
+}

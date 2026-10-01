@@ -13,6 +13,17 @@ export const GetAllUsersAPI = async () => {
 	});
 };
 
+export const CreateUserAPI = async (data: {
+	name: string;
+	email: string;
+	password: string;
+}) => {
+	const token = localStorage.getItem("token");
+	return axios.post(`${API_BASE_URL}admin/op/create-user`, data, {
+		headers: { "x-access-token": token },
+	});
+};
+
 export const GetUserDetailsAPI = async (userId: number) => {
 	const token = localStorage.getItem("token");
 	return axios.get(`${API_BASE_URL}admin/op/users/details/${userId}`, {

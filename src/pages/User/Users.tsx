@@ -306,10 +306,16 @@ const Users = () => {
           <h1 className="users-title">Users</h1>
           <p className="users-sub">Manage accounts, credits & manuscripts</p>
         </div>
-        <div className="users-total-pill">
-          <UsersIcon size={14} />
-          {users.length} total
-        </div>
+      <div className="users-header-actions">
+  <div className="users-total-pill">
+    <UsersIcon size={14} />
+    {users.length} total
+  </div>
+  <button className="btn-add-user" onClick={() => navigate("/users/add")}>
+    <Plus size={15} />
+    Add user
+  </button>
+</div>
       </div>
 
       {/* ── STATS STRIP ── */}
