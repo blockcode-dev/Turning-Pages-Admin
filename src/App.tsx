@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router";
 import { Toaster } from "@/components/ui/toaster";
 import { AdminLayout } from "./components/AdminLayout";
 import { PageLoader } from "./components/PageLoader";

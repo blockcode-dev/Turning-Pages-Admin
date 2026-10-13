@@ -1,7 +1,7 @@
 /** @format */
 
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { ChevronDown, Key, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {

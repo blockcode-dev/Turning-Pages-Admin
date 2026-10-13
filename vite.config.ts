@@ -27,7 +27,7 @@ export default defineConfig(({ mode }) => ({
         // changes when dependencies change, so browsers keep it cached across deploys.
         // (Kept as one chunk: splitting React and Radix apart causes a load-order cycle.)
         manualChunks(id) {
-          if (/[\\/]node_modules[\\/](react|react-dom|react-router|react-router-dom|scheduler|@remix-run|@radix-ui)[\\/]/.test(id)) {
+          if (/[\\/]node_modules[\\/](react|react-dom|react-router|scheduler|@radix-ui)[\\/]/.test(id)) {
             return "vendor";
           }
         },

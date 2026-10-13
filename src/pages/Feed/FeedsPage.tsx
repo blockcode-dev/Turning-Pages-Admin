@@ -13,7 +13,7 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 import { Eye } from "lucide-react";
 import { GetAllFeedsAPI } from "@/services/Api/FeedsApi";

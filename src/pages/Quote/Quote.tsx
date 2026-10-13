@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/table";
 import { ArrowUpDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 import { BookOpen, Eye, Pencil, Plus, Trash2, Upload } from "lucide-react";
 

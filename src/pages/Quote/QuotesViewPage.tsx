@@ -1,7 +1,7 @@
 /** @format */
 
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Pencil, Hash, User, AlignLeft, BarChart2, Calendar, RefreshCw } from "lucide-react";
 import { GetQuoteByIdAPI } from "@/services/Api/QuoteApi";

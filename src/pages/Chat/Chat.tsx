@@ -1,7 +1,7 @@
 /** @format */
 
 import React, { useState, useRef, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import "./Chat.scss";
 
 import { collection, query, orderBy, onSnapshot } from "firebase/firestore";

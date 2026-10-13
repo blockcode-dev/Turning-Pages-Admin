@@ -1,7 +1,7 @@
 /** @format */
 
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { Lock } from "lucide-react";
 
 const UnauthorizedPage = () => {

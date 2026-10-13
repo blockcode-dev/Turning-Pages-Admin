@@ -12,7 +12,7 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { GetAllSubscriptionsAPI } from "@/services/Api/PaymentApi";
 
 const CREDIT_PACKAGES = {

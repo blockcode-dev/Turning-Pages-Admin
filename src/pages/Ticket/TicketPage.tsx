@@ -15,7 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Eye, Pencil } from "lucide-react";
 
 import { GetAllTicketsAPI } from "@/services/Api/TicketApi";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import TicketViewModal from "./TicketViewModal";
 import TicketEditModal from "./TicketEditModal";
 
