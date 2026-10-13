@@ -7,7 +7,6 @@ import { CalendarIcon, Eye, Filter, X, BookOpen } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
 	Table,
 	TableBody,
@@ -528,7 +527,7 @@ const EditingQueue = () => {
 
 					{selectedManuscript && (
 						<div className="space-y-5 mt-1">
-							<div className="grid grid-cols-2 gap-4">
+							<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 								{[
 									{
 										label: "Author",

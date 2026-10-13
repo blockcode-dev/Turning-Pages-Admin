@@ -33,8 +33,8 @@ const STATUS_CFG: Record<
   },
   closed: {
     label: "Closed",
-    dot: "bg-slate-400",
-    chip: "bg-slate-100 text-slate-600 border border-slate-200",
+    dot: "bg-muted-foreground/40",
+    chip: "bg-muted text-muted-foreground border border-border",
     bar: "from-slate-300 to-slate-400",
   },
   pending: {
@@ -70,8 +70,8 @@ const PRIORITY_CFG: Record<
 > = {
   low: {
     label: "Low",
-    dot: "bg-slate-400",
-    chip: "bg-slate-100 text-slate-500 border border-slate-200",
+    dot: "bg-muted-foreground/40",
+    chip: "bg-muted text-muted-foreground border border-border",
     icon: "↓",
   },
   medium: {
@@ -133,12 +133,12 @@ function StatPill({
   chipClass?: string;
 }) {
   return (
-    <div className="flex items-center justify-between px-4 py-3 rounded-xl bg-slate-50 border border-slate-100 hover:bg-slate-100/70 transition-colors">
+    <div className="flex items-center justify-between px-4 py-3 rounded-xl bg-muted/50 border border-border hover:bg-muted/70 transition-colors">
       <div className="flex items-center gap-2.5">
-        <div className="w-7 h-7 rounded-lg bg-white border border-slate-100 shadow-sm flex items-center justify-center">
-          <Icon size={13} className="text-slate-400" />
+        <div className="w-7 h-7 rounded-lg bg-white border border-border shadow-sm flex items-center justify-center">
+          <Icon size={13} className="text-muted-foreground" />
         </div>
-        <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">{label}</span>
+        <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{label}</span>
       </div>
       <div className="flex items-center gap-2">
         {dot && <span className={`h-2 w-2 rounded-full ${dot} shadow-sm`} />}
@@ -159,10 +159,10 @@ function SectionCard({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-xl bg-white border border-slate-100 shadow-sm overflow-hidden">
-      <div className="flex items-center gap-2 px-4 py-2.5 bg-slate-50 border-b border-slate-100">
-        <Icon size={11} className="text-slate-400" />
-        <span className="text-[10px] uppercase tracking-widest font-semibold text-slate-400">
+    <div className="rounded-xl bg-white border border-border shadow-sm overflow-hidden">
+      <div className="flex items-center gap-2 px-4 py-2.5 bg-muted/50 border-b border-border">
+        <Icon size={11} className="text-muted-foreground" />
+        <span className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground">
           {label}
         </span>
       </div>
@@ -210,18 +210,18 @@ export default function TicketViewModal({ ticket, onClose }: any) {
         <div className={`h-[3px] w-full bg-gradient-to-r ${s.bar}`} />
 
         {/* ── HEADER ── */}
-        <div className="px-6 pt-5 pb-4 bg-white border-b border-slate-100">
+        <div className="px-6 pt-5 pb-4 bg-white border-b border-border">
           {/* Meta row */}
           <div className="flex flex-wrap items-center gap-2 mb-3">
-            <span className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[11px] font-mono font-semibold text-slate-500 bg-slate-100 border border-slate-200">
+            <span className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[11px] font-mono font-semibold text-muted-foreground bg-muted border border-border">
               <Hash size={10} className="opacity-60" />
               {ticket.ticket_code}
             </span>
-            <span className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[11px] text-slate-500 bg-slate-50 border border-slate-100">
+            <span className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[11px] text-muted-foreground bg-muted/50 border border-border">
               <CalendarDays size={10} className="opacity-60" />
               {dateStr}
             </span>
-            <span className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[11px] text-slate-500 bg-slate-50 border border-slate-100">
+            <span className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[11px] text-muted-foreground bg-muted/50 border border-border">
               <Clock size={10} className="opacity-60" />
               {timeStr}
             </span>
@@ -237,7 +237,7 @@ export default function TicketViewModal({ ticket, onClose }: any) {
 
           {/* Title */}
           <DialogHeader>
-            <DialogTitle className="text-[15px] font-semibold text-slate-800 leading-snug pr-2">
+            <DialogTitle className="text-[15px] font-semibold text-foreground leading-snug pr-2">
               {ticket.subject}
             </DialogTitle>
           </DialogHeader>
@@ -250,8 +250,8 @@ export default function TicketViewModal({ ticket, onClose }: any) {
                 onClick={() => setTab(t)}
                 className={`text-xs font-medium px-4 py-2 rounded-lg transition-all duration-200 border ${
                   tab === t
-                    ? "bg-slate-900 text-white border-slate-900"
-                    : "bg-white text-slate-500 border-slate-200 hover:bg-slate-50 hover:text-slate-700"
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-white text-muted-foreground border-border hover:bg-muted/50 hover:text-foreground"
                 }`}
               >
                 {t === "conversation"
@@ -263,14 +263,14 @@ export default function TicketViewModal({ ticket, onClose }: any) {
         </div>
 
         {/* ── BODY ── */}
-        <div className="flex-1 overflow-y-auto bg-slate-50/50">
+        <div className="flex-1 overflow-y-auto bg-muted/50/50">
 
           {/* ── DETAILS TAB ── */}
           {tab === "details" && (
             <div className="px-6 py-5 space-y-3">
 
               {/* Status + Priority */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <StatPill
                   icon={Activity}
                   label="Status"
@@ -296,8 +296,8 @@ export default function TicketViewModal({ ticket, onClose }: any) {
                     {getInitials(name)}
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-slate-800">{name}</p>
-                    <p className="text-xs text-slate-400 mt-0.5">{email}</p>
+                    <p className="text-sm font-semibold text-foreground">{name}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{email}</p>
                   </div>
                 </div>
               </SectionCard>
@@ -312,15 +312,15 @@ export default function TicketViewModal({ ticket, onClose }: any) {
                       {getInitials(ticket.assigned_admin.name)}
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-slate-800">
+                      <p className="text-sm font-semibold text-foreground">
                         {ticket.assigned_admin.name}
                       </p>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-[11px] text-slate-400">
+                        <span className="text-[11px] text-muted-foreground">
                           {getRoleLabel(ticket.assigned_admin.role_id)}
                         </span>
-                        <ChevronRight size={9} className="text-slate-300" />
-                        <span className="text-[11px] text-slate-400">
+                        <ChevronRight size={9} className="text-muted-foreground/50" />
+                        <span className="text-[11px] text-muted-foreground">
                           {ticket.assigned_admin.email}
                         </span>
                       </div>
@@ -332,7 +332,7 @@ export default function TicketViewModal({ ticket, onClose }: any) {
               {/* Description */}
               {ticket.description && (
                 <SectionCard icon={FileText} label="Description">
-                  <p className="text-sm text-slate-600 leading-relaxed">
+                  <p className="text-sm text-muted-foreground leading-relaxed">
                     {ticket.description}
                   </p>
                 </SectionCard>
@@ -345,13 +345,13 @@ export default function TicketViewModal({ ticket, onClose }: any) {
             <div className="px-6 py-5">
               {messages.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-16 gap-3">
-                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-white border border-slate-100 shadow-sm">
-                    <MessageCircle size={22} className="text-slate-300" />
+                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-white border border-border shadow-sm">
+                    <MessageCircle size={22} className="text-muted-foreground/50" />
                   </div>
-                  <p className="text-sm text-slate-500 font-medium">
+                  <p className="text-sm text-muted-foreground font-medium">
                     No messages yet
                   </p>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-muted-foreground">
                     Conversation will appear here
                   </p>
                 </div>
@@ -374,7 +374,7 @@ export default function TicketViewModal({ ticket, onClose }: any) {
                         <div
                           className={`h-7 w-7 rounded-lg flex-shrink-0 flex items-center justify-center text-[10px] font-bold text-white shadow-sm ${
                             isAdmin
-                              ? "bg-gradient-to-br from-blue-500 to-indigo-600"
+                              ? "bg-primary"
                               : "bg-gradient-to-br from-slate-400 to-slate-500"
                           }`}
                         >
@@ -390,18 +390,18 @@ export default function TicketViewModal({ ticket, onClose }: any) {
                               isInternal
                                 ? "bg-amber-50 border border-amber-200 text-amber-800"
                                 : isAdmin
-                                ? "bg-gradient-to-br from-blue-500 to-indigo-600 text-white"
-                                : "bg-white border border-slate-200 text-slate-700"
+                                ? "bg-primary text-white"
+                                : "bg-white border border-border text-foreground"
                             }`}
                             style={
                               isAdmin && !isInternal
-                                ? { boxShadow: "0 4px 14px rgba(59,130,246,0.25)" }
+                                ? { boxShadow: "0 4px 14px hsl(var(--primary) / 0.25)" }
                                 : {}
                             }
                           >
                             {msg.message}
                           </div>
-                          <span className="text-[10px] text-slate-400 px-1">
+                          <span className="text-[10px] text-muted-foreground px-1">
                             {msgTime}
                           </span>
                         </div>

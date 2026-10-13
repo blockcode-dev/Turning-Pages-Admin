@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import logo from "@/assets/logo.png";
 import { SendOtpApi, VerifyOtpApi, ForgotPasswordApi } from "@/services/Api/AuthApi";
 
 export default function AdminForgotPassword() {
@@ -23,14 +24,8 @@ export default function AdminForgotPassword() {
   const [showConfirmPass, setShowConfirmPass] = useState(false);
 
   const { toast } = useToast();
+  const navigate = useNavigate();
 
-  // Animation variants
-  const stepAnim = {
-    initial: { opacity: 0, x: 40 },
-    animate: { opacity: 1, x: 0 },
-    exit: { opacity: 0, x: -40 },
-    transition: { duration: 0.35, ease: "easeOut" },
-  };
 
   // STEP 1 → SEND OTP
   const handleSendOtp = async () => {
@@ -119,7 +114,7 @@ setToken(res.data.data.token);
 
       if (res.data?.success) {
         toast({ title: "Password changed successfully!" });
-        window.location.href = "/";
+        navigate("/", { replace: true });
       }
     } catch (err: any) {
       toast({
@@ -133,9 +128,10 @@ setToken(res.data.data.token);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
-      <Card className="w-full max-w-md shadow-md relative overflow-hidden">
-        <CardHeader>
+    <div className="min-h-svh flex items-center justify-center bg-background px-4 py-10">
+      <Card className="w-full max-w-md border-border/70 shadow-lg relative overflow-hidden">
+        <CardHeader className="items-center space-y-3">
+          <img src={logo} alt="Turning Pages" className="h-16 w-auto" />
           <CardTitle className="text-center text-2xl font-semibold">
             {step === 1 && "Forgot Password"}
             {step === 2 && "Verify OTP"}
@@ -144,11 +140,10 @@ setToken(res.data.data.token);
         </CardHeader>
 
         <CardContent>
-          <AnimatePresence mode="wait">
 
             {/* STEP 1 */}
             {step === 1 && (
-              <motion.div key="step1" {...stepAnim} className="space-y-4">
+              <div key="step1" className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
                 <Input
                   placeholder="Enter your email"
                   value={email}
@@ -168,16 +163,16 @@ setToken(res.data.data.token);
                 <Button
                   variant="ghost"
                   className="w-full text-primary"
-                  onClick={() => (window.location.href = "/")}
+                  onClick={() => navigate("/")}
                 >
                   Back to Login
                 </Button>
-              </motion.div>
+              </div>
             )}
 
             {/* STEP 2 */}
             {step === 2 && (
-              <motion.div key="step2" {...stepAnim} className="space-y-4">
+              <div key="step2" className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
                 <Input
                   placeholder="Enter OTP"
                   value={otp}
@@ -188,6 +183,8 @@ setToken(res.data.data.token);
                 <p className="text-sm text-muted-foreground text-right">
                   Didn’t receive OTP?{" "}
                   <button
+                    type="button"
+                    disabled={loading}
                     onClick={handleSendOtp}
                     className="text-primary underline font-medium"
                   >
@@ -202,12 +199,12 @@ setToken(res.data.data.token);
                 >
                   {loading ? "Verifying..." : "Verify OTP"}
                 </Button>
-              </motion.div>
+              </div>
             )}
 
             {/* STEP 3 — RESET PASSWORD WITH EYE TOGGLE */}
             {step === 3 && (
-              <motion.div key="step3" {...stepAnim} className="space-y-4">
+              <div key="step3" className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
 
                 {/* Password with eye icon */}
                 <div className="relative">
@@ -260,9 +257,8 @@ setToken(res.data.data.token);
                 >
                   {loading ? "Updating..." : "Change Password"}
                 </Button>
-              </motion.div>
+              </div>
             )}
-          </AnimatePresence>
         </CardContent>
       </Card>
     </div>

@@ -100,29 +100,29 @@ export default function TicketEditModal({ ticket, onClose }: any) {
   return (
     <Dialog open onOpenChange={onClose}>
       {" "}
-      <DialogContent className="gap-0 overflow-hidden rounded-2xl p-0 sm:max-w-lg max-h-[85vh] flex flex-col bg-white border border-slate-200 shadow-xl">
+      <DialogContent className="gap-0 overflow-hidden rounded-2xl p-0 sm:max-w-lg max-h-[85vh] flex flex-col bg-white border border-border shadow-xl">
         {/* HEADER */}
-        <div className="px-6 pt-5 pb-4 border-b border-slate-100">
-          <span className="text-[11px] font-mono text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md">
+        <div className="px-6 pt-5 pb-4 border-b border-border">
+          <span className="text-[11px] font-mono text-muted-foreground bg-muted px-2 py-0.5 rounded-md">
             {ticket.ticket_code}
           </span>
 
           <DialogHeader className="mt-2">
-            <DialogTitle className="text-base font-semibold text-slate-800">
+            <DialogTitle className="text-base font-semibold text-foreground">
               {ticket.subject}
             </DialogTitle>
           </DialogHeader>
 
           {/* Tabs */}
-          <div className="flex gap-1 mt-4 bg-slate-100 p-1 rounded-lg w-fit">
+          <div className="flex gap-1 mt-4 bg-muted p-1 rounded-lg w-fit">
             {(["edit", "conversation"] as const).map((t) => (
               <button
                 key={t}
                 onClick={() => setTab(t)}
                 className={`text-xs font-medium px-4 py-1.5 rounded-md transition-all ${
                   tab === t
-                    ? "bg-white text-slate-800 shadow-sm"
-                    : "text-slate-500 hover:text-slate-700"
+                    ? "bg-white text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {t === "conversation"
@@ -140,13 +140,13 @@ export default function TicketEditModal({ ticket, onClose }: any) {
             <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
               {/* Status */}
               <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">
+                <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5">
                   Status
                 </label>
                 <select
                   value={status}
                   onChange={(e) => setStatus(e.target.value)}
-                  className="w-full text-sm text-slate-700 border border-slate-200 rounded-xl px-3 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-slate-200"
+                  className="w-full text-sm text-foreground border border-border rounded-xl px-3 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-border"
                 >
                   <option value="open">Open</option>
                   <option value="in_progress">In Progress</option>
@@ -158,13 +158,13 @@ export default function TicketEditModal({ ticket, onClose }: any) {
 
               {/* Priority */}
               <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">
+                <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5">
                   Priority
                 </label>
                 <select
                   value={priority}
                   onChange={(e) => setPriority(e.target.value)}
-                  className="w-full text-sm text-slate-700 border border-slate-200 rounded-xl px-3 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-slate-200"
+                  className="w-full text-sm text-foreground border border-border rounded-xl px-3 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-border"
                 >
                   <option value="low">Low</option>
                   <option value="medium">Medium</option>
@@ -175,13 +175,13 @@ export default function TicketEditModal({ ticket, onClose }: any) {
 
               {/* Assign Editor */}
               <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">
+                <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5">
                   Assign Editor
                 </label>
                 <select
                   value={assignedTo || ""}
                   onChange={(e) => setAssignedTo(e.target.value)}
-                  className="w-full text-sm text-slate-700 border border-slate-200 rounded-xl px-3 py-2.5 bg-white"
+                  className="w-full text-sm text-foreground border border-border rounded-xl px-3 py-2.5 bg-white"
                 >
                   <option value="">— Unassigned —</option>
                   {editors.map((editor: any) => (
@@ -192,7 +192,7 @@ export default function TicketEditModal({ ticket, onClose }: any) {
                 </select>
 
                 {selectedEditor && (
-                  <p className="text-xs text-slate-400 mt-1.5 pl-1">
+                  <p className="text-xs text-muted-foreground mt-1.5 pl-1">
                     {selectedEditor.email} ·{" "}
                     {getRoleLabel(selectedEditor.role_id)}
                   </p>
@@ -203,7 +203,7 @@ export default function TicketEditModal({ ticket, onClose }: any) {
               <div className="flex justify-end gap-2 pt-2">
                 <button
                   onClick={onClose}
-                  className="text-sm px-4 py-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50"
+                  className="text-sm px-4 py-2 rounded-xl border border-border text-muted-foreground hover:bg-muted/50"
                 >
                   Cancel
                 </button>
@@ -211,7 +211,7 @@ export default function TicketEditModal({ ticket, onClose }: any) {
                 <button
                   onClick={handleSave}
                   disabled={saving}
-                  className="text-sm px-5 py-2 rounded-xl bg-indigo-500 text-white hover:bg-indigo-600 disabled:opacity-50"
+                  className="text-sm px-5 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary-hover disabled:opacity-50"
                 >
                   {saving ? "Saving…" : "Save Changes"}
                 </button>
@@ -226,10 +226,10 @@ export default function TicketEditModal({ ticket, onClose }: any) {
               <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
                 {messages.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-16 gap-2">
-                    <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center">
-                      <MessageCircle size={20} className="text-slate-300" />
+                    <div className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center">
+                      <MessageCircle size={20} className="text-muted-foreground/50" />
                     </div>
-                    <p className="text-sm text-slate-400">No messages yet</p>
+                    <p className="text-sm text-muted-foreground">No messages yet</p>
                   </div>
                 ) : (
                   messages.map((msg: any) => {
@@ -253,7 +253,7 @@ export default function TicketEditModal({ ticket, onClose }: any) {
                       >
                         <div
                           className={`h-7 w-7 rounded-lg flex items-center justify-center text-[10px] font-bold text-white ${
-                            isAdmin ? "bg-amber-100 text-amber-900 border border-amber-300 shadow-sm" : "bg-slate-300"
+                            isAdmin ? "bg-amber-100 text-amber-900 border border-amber-300 shadow-sm" : "bg-muted-foreground/40"
                           }`}
                         >
                           {isAdmin ? "A" : "U"}
@@ -271,13 +271,13 @@ export default function TicketEditModal({ ticket, onClose }: any) {
                               ? "bg-amber-100 text-amber-900 border border-amber-300"
                               : isInternal
                                 ? "bg-amber-50 border border-amber-200 text-amber-800"
-                                : "bg-slate-100 text-slate-700"
+                                : "bg-muted text-foreground"
                           }`}
                           >
                             {msg.message}
                           </div>
 
-                          <span className="text-[10px] text-slate-400 px-1">
+                          <span className="text-[10px] text-muted-foreground px-1">
                             {msgTime}
                           </span>
                         </div>
@@ -288,7 +288,7 @@ export default function TicketEditModal({ ticket, onClose }: any) {
               </div>
 
               {/* Input */}
-              <div className="px-4 py-3 bg-slate-50 border-t flex items-center gap-2">
+              <div className="px-4 py-3 bg-muted/50 border-t flex items-center gap-2">
                 <input
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
@@ -296,13 +296,13 @@ export default function TicketEditModal({ ticket, onClose }: any) {
                     e.key === "Enter" && !e.shiftKey && handleSendMessage()
                   }
                   placeholder="Type a message…"
-                  className="flex-1 text-sm bg-white border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+                  className="flex-1 text-sm bg-white border border-border rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/20"
                 />
 
                 <button
                   onClick={handleSendMessage}
                   disabled={!message.trim() || sending}
-                  className="h-10 w-10 rounded-xl bg-indigo-500 flex items-center justify-center text-white hover:bg-indigo-600 disabled:opacity-40"
+                  className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center text-primary-foreground hover:bg-primary-hover disabled:opacity-40"
                 >
                   <Send size={14} />
                 </button>

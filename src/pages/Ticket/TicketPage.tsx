@@ -67,7 +67,7 @@ export default function TicketsPage() {
       case "resolved":
         return "bg-purple-100 text-purple-700 border-purple-200";
       case "closed":
-        return "bg-gray-200 text-gray-700 border-gray-300";
+        return "bg-muted text-foreground border-border";
       default:
         return "bg-muted text-muted-foreground";
     }
@@ -77,7 +77,7 @@ export default function TicketsPage() {
   const getPriorityStyle = (priority: string) => {
     switch (priority) {
       case "low":
-        return "bg-gray-100 text-gray-600 border-gray-200";
+        return "bg-muted text-muted-foreground border-border";
       case "medium":
         return "bg-yellow-100 text-yellow-700 border-yellow-200";
       case "high":
@@ -90,8 +90,8 @@ export default function TicketsPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-7xl">
-      <h1 className="text-3xl font-bold">Ticket Management</h1>
+    <div className="space-y-6">
+      <h1 className="text-2xl sm:text-3xl font-bold">Ticket Management</h1>
 
       <Card>
         <CardContent className="pt-6">

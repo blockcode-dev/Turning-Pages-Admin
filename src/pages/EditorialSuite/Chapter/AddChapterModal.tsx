@@ -4,10 +4,9 @@ import { useState } from "react";
 import {
 	Dialog,
 	DialogContent,
-	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
-import { BookPlus, Loader2, X } from "lucide-react";
+import { BookPlus, Loader2 } from "lucide-react";
 import "./AddChapterModal.scss";
 
 interface AddChapterModalProps {

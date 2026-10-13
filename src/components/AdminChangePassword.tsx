@@ -58,16 +58,16 @@ export default function AdminChangePassword() {
   };
 
   return (
-   <div className="w-full flex justify-center items-start py-12 px-6">
+   <div className="w-full flex justify-center items-start py-2 sm:py-8">
   <div className="w-full max-w-xl">
-    <Card className="shadow-md border border-gray-200 rounded-xl overflow-hidden">
+    <Card className="shadow-md border border-border rounded-xl overflow-hidden">
 
-      <CardHeader className="bg-gradient-to-r from-amber-50 to-white border-b py-6">
-        <CardTitle className="flex items-center gap-3 text-gray-900 text-xl">
-          <Key className="h-6 w-6 text-amber-600" />
+      <CardHeader className="bg-accent/60 border-b py-6">
+        <CardTitle className="flex items-center gap-3 text-foreground text-xl">
+          <Key className="h-6 w-6 text-primary" />
           Change Password
         </CardTitle>
-        <CardDescription className="text-gray-600">
+        <CardDescription className="text-muted-foreground">
           Update your password to keep your account secure
         </CardDescription>
       </CardHeader>
@@ -76,8 +76,8 @@ export default function AdminChangePassword() {
 
         {/* Current Password */}
         <div className="space-y-2">
-          <Label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-            <Lock className="h-4 w-4 text-gray-400" />
+          <Label className="text-sm font-semibold text-foreground flex items-center gap-2">
+            <Lock className="h-4 w-4 text-muted-foreground" />
             Current Password
           </Label>
           <div className="relative">
@@ -86,12 +86,12 @@ export default function AdminChangePassword() {
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
               placeholder="Enter current password"
-              className="h-11 rounded-md border-gray-300 focus:border-amber-500 focus:ring-amber-500/20 pr-12"
+              className="h-11 rounded-md pr-12"
             />
             <button
               type="button"
               onClick={() => setShowCurrent(!showCurrent)}
-              className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-amber-600"
+              className="absolute inset-y-0 right-3 flex items-center text-muted-foreground hover:text-foreground"
             >
               {showCurrent ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
@@ -103,19 +103,19 @@ export default function AdminChangePassword() {
 
           {/* New Password */}
           <div className="space-y-2">
-            <Label className="text-sm font-semibold text-gray-700">New Password</Label>
+            <Label className="text-sm font-semibold text-foreground">New Password</Label>
             <div className="relative">
               <Input
                 type={showNew ? "text" : "password"}
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder="Enter new password"
-                className="h-11 rounded-md border-gray-300 focus:border-amber-500 focus:ring-amber-500/20 pr-12"
+                className="h-11 rounded-md pr-12"
               />
               <button
                 type="button"
                 onClick={() => setShowNew(!showNew)}
-                className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-amber-600"
+                className="absolute inset-y-0 right-3 flex items-center text-muted-foreground hover:text-foreground"
               >
                 {showNew ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
@@ -124,19 +124,19 @@ export default function AdminChangePassword() {
 
           {/* Confirm Password */}
           <div className="space-y-2">
-            <Label className="text-sm font-semibold text-gray-700">Confirm New Password</Label>
+            <Label className="text-sm font-semibold text-foreground">Confirm New Password</Label>
             <div className="relative">
               <Input
                 type={showConfirm ? "text" : "password"}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="Confirm new password"
-                className="h-11 rounded-md border-gray-300 focus:border-amber-500 focus:ring-amber-500/20 pr-12"
+                className="h-11 rounded-md pr-12"
               />
               <button
                 type="button"
                 onClick={() => setShowConfirm(!showConfirm)}
-                className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-amber-600"
+                className="absolute inset-y-0 right-3 flex items-center text-muted-foreground hover:text-foreground"
               >
                 {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
@@ -148,7 +148,7 @@ export default function AdminChangePassword() {
         <div className="flex justify-center pt-4">
           <Button
             onClick={handleChangePassword}
-            className="bg-[#ed1c24] hover:bg-[#d1151c] text-white px-6 h-11 rounded-lg shadow-md hover:shadow-lg transition-all flex items-center"
+            className="px-6 h-11"
           >
             <Key className="h-4 w-4 mr-2" />
             Change Password

@@ -187,7 +187,7 @@ const DeliverManuscript = () => {
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Deliver Manuscript</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Deliver Manuscript</h1>
           <p className="text-muted-foreground mt-1">
             Complete the editing process and deliver to author
           </p>

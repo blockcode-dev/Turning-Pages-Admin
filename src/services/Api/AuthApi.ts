@@ -1,7 +1,5 @@
 import axios from "axios";
-
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "https://api.turningpages.io/api/v1/";
+import { API_BASE_URL } from "@/config/env";
 
 export const AdminLoginAPI = async (email: string, password: string) => {
   const formData = new FormData();
@@ -18,6 +16,7 @@ export const AdminLoginAPI = async (email: string, password: string) => {
 
 export const SendOtpApi = (data: {
   email: string;
+  otp_type?: string;
 }) => {
   return axios.post(`${API_BASE_URL}admin/auth/otp`, data);
 };

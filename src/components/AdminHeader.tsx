@@ -1,121 +1,93 @@
 /** @format */
 
 import { useEffect, useState } from "react";
-import { Search, Bell, User, LogOut, Menu, Key } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { useNavigate } from "react-router-dom";
+import { ChevronDown, Key, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
+	DropdownMenuLabel,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { GetAdminProfileAPI } from "@/services/Api/AuthApi";
 
+const ADMIN_NAME_KEY = "admin_name";
+
 export function AdminHeader() {
-	const [notificationCount] = useState(3);
+	const navigate = useNavigate();
+	const [adminName, setAdminName] = useState(
+		() => sessionStorage.getItem(ADMIN_NAME_KEY) || "Admin User",
+	);
 
-	  const [adminName, setAdminName] = useState("Admin User");
+	useEffect(() => {
+		// The profile name rarely changes; fetch it once per browser session.
+		if (sessionStorage.getItem(ADMIN_NAME_KEY)) return;
+		const token = localStorage.getItem("token");
+		if (!token) return;
 
-  useEffect(() => {
-    loadAdminProfile();
-  }, []);
+		GetAdminProfileAPI({ token })
+			.then((res) => {
+				if (res?.data?.success) {
+					const name = res.data.data.name || "Admin User";
+					sessionStorage.setItem(ADMIN_NAME_KEY, name);
+					setAdminName(name);
+				}
+			})
+			.catch(() => {});
+	}, []);
 
-  const loadAdminProfile = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
+	const handleLogout = () => {
+		localStorage.removeItem("token");
+		localStorage.removeItem("isAdmin");
+		localStorage.removeItem("role_id");
+		localStorage.removeItem("admin_id");
+		sessionStorage.removeItem(ADMIN_NAME_KEY);
+		navigate("/", { replace: true });
+	};
 
-      const res = await GetAdminProfileAPI({ token });
-
-      if (res?.data?.success) {
-        setAdminName(res.data.data.name || "Admin User");
-      }
-    } catch (err) {
-      console.log("Failed to load profile");
-    }
-  };
+	const initial = adminName.trim().charAt(0).toUpperCase() || "A";
 
 	return (
-		<header className="h-16 border-b bg-card px-6 flex items-center justify-between">
-			<div className="flex items-center gap-4">
-				<SidebarTrigger />
-			</div>
+		<header className="sticky top-0 z-20 flex h-16 items-center justify-between gap-4 border-b bg-card/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-card/80 sm:px-6">
+			<SidebarTrigger className="text-muted-foreground hover:text-foreground" />
 
-			<div className="flex items-center gap-4">
-				{/* <div className="relative w-80">
-					<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-					<Input
-						placeholder="Search manuscripts, editors, projects..."
-						className="pl-10"
-					/>
-				</div> */}
-
-				{/* <div className="relative">
-					<Button variant="ghost" size="icon" className="relative">
-						<Bell className="h-5 w-5" />
-						{notificationCount > 0 && (
-							<Badge
-								variant="destructive"
-								className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs bg-primary"
-							>
-								{notificationCount}
-							</Badge>
-						)}
+			<DropdownMenu>
+				<DropdownMenuTrigger asChild>
+					<Button variant="ghost" className="h-10 gap-2 px-2 sm:px-3">
+						<span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
+							{initial}
+						</span>
+						<span className="hidden max-w-[160px] truncate font-medium sm:inline">{adminName}</span>
+						<ChevronDown className="hidden h-4 w-4 text-muted-foreground sm:block" />
 					</Button>
-				</div> */}
-
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<Button variant="ghost" className="flex items-center gap-2">
-							<div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-								<User className="h-4 w-4 text-primary" />
-							</div>
-							<span className="font-medium">{adminName}</span>
-						</Button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent
-						align="end"
-						className="w-56 bg-card border shadow-lg"
+				</DropdownMenuTrigger>
+				<DropdownMenuContent align="end" className="w-56">
+					<DropdownMenuLabel className="truncate font-normal text-muted-foreground">
+						{adminName}
+					</DropdownMenuLabel>
+					<DropdownMenuSeparator />
+					<DropdownMenuItem className="cursor-pointer gap-2" onClick={() => navigate("/admin/profile")}>
+						<User className="h-4 w-4" />
+						Profile
+					</DropdownMenuItem>
+					<DropdownMenuItem className="cursor-pointer gap-2" onClick={() => navigate("/change-password")}>
+						<Key className="h-4 w-4" />
+						Change Password
+					</DropdownMenuItem>
+					<DropdownMenuSeparator />
+					<DropdownMenuItem
+						className="cursor-pointer gap-2 text-destructive focus:bg-destructive/10 focus:text-destructive"
+						onClick={handleLogout}
 					>
-						<DropdownMenuItem
-							className="flex items-center gap-2"
-							onClick={() => (window.location.href = "/admin/profile")}
-						>
-							<User className="h-4 w-4" />
-							Profile
-						</DropdownMenuItem>
-						<DropdownMenuSeparator />
-						<DropdownMenuItem
-							className="flex items-center gap-2 cursor-pointer"
-							onClick={() => (window.location.href = "/change-password")}
-						>
-							<Key className="h-4 w-4" />
-							Change Password
-						</DropdownMenuItem>
-						<DropdownMenuSeparator />
-						<DropdownMenuItem
-							className="flex items-center gap-2 text-destructive cursor-pointer"
-							onClick={() => {
-								// Remove auth data
-								localStorage.removeItem("token");
-								localStorage.removeItem("isAdmin");
-								localStorage.removeItem("role_id");
-								localStorage.removeItem("admin_id");
-
-								// Redirect to homepage
-								window.location.href = "/";
-							}}
-						>
-							<LogOut className="h-4 w-4" />
-							Logout
-						</DropdownMenuItem>
-					</DropdownMenuContent>
-				</DropdownMenu>
-			</div>
+						<LogOut className="h-4 w-4" />
+						Logout
+					</DropdownMenuItem>
+				</DropdownMenuContent>
+			</DropdownMenu>
 		</header>
 	);
 }

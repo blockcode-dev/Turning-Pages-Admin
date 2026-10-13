@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowUpDown } from "lucide-react";
-import "./Editors.scss";
 import {
   Select,
   SelectContent,
@@ -30,8 +29,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   UserPlus,
   Shield,
@@ -39,9 +37,7 @@ import {
   Edit3,
   CheckCircle,
   Clock,
-  Settings,
   FileText,
-  Users,
   Key,
   AlertTriangle,
 } from "lucide-react";
@@ -51,7 +47,6 @@ import {
   DeleteEditorAPI,
   GetAllEditorsAPI,
   GetEditorStatsAPI,
-  UpdateEditorStatusAPI,
 } from "@/services/Api/EditorApi";
 import { useNavigate } from "react-router-dom";
 
@@ -189,33 +184,6 @@ const Editors = () => {
     loadStats();
   }, []);
 
-  const handleToggleStatus = async (editor: any) => {
-    try {
-      const newStatus = editor.is_active ? "deactive" : "active";
-
-      await UpdateEditorStatusAPI({
-        editorId: editor.id,
-        status: newStatus,
-      });
-
-      toast({
-        title: `Editor ${newStatus === "active" ? "Activated" : "Deactivated"}`,
-      });
-
-      loadEditors();
-      loadStats();
-    } catch (err) {
-      if (err.response?.status === 401) {
-        localStorage.removeItem("token");
-        return navigate("/login");
-      }
-      toast({
-        title: "Failed to update status",
-        variant: "destructive",
-      });
-    }
-  };
-
   const handleAddEditor = async () => {
     if (!newEditor.name || !newEditor.email) {
       toast({
@@ -337,9 +305,9 @@ const Editors = () => {
   return (
     <div className="space-y-6">
       {/* HEADER */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
             Access Controls
           </h1>
           <p className="text-muted-foreground mt-2">

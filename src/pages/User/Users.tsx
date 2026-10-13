@@ -1,7 +1,6 @@
 /** @format */
 
 import { useEffect, useState } from "react";
-import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
 import {
   Select,
@@ -22,7 +21,6 @@ import {
   Search,
   Eye,
   UserX,
-  UserCheck,
   RotateCcw,
   CalendarIcon,
   Mail,
@@ -35,7 +33,6 @@ import {
   Coins,
   TrendingUp,
   Shield,
-  ChevronRight,
   Loader2,
   Zap,
 } from "lucide-react";
@@ -47,7 +44,6 @@ import {
   GetAllUsersAPI,
   GetUserDetailsAPI,
   GetUserStatsAPI,
-  UpdateUserStatusAPI,
 } from "@/services/Api/UserApi";
 import "./Users.scss";
 
@@ -92,23 +88,6 @@ const Users = () => {
       setStats(res.data.data);
     } catch {
       toast({ title: "Failed to load stats", variant: "destructive" });
-    }
-  };
-
-  const handleToggleStatus = async (user: any) => {
-    const backendStatus = user.status === "ACCEPTED" ? "deactive" : "active";
-    setTogglingId(user.id);
-    try {
-      await UpdateUserStatusAPI({ userId: user.id, status: backendStatus });
-      toast({
-        title: `User ${backendStatus === "active" ? "Activated" : "Deactivated"}`,
-      });
-      loadUsers();
-      loadStats();
-    } catch {
-      toast({ title: "Failed to update status", variant: "destructive" });
-    } finally {
-      setTogglingId(null);
     }
   };
 

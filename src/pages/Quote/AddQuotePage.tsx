@@ -95,9 +95,9 @@ export default function AddQuotePage() {
   };
 
   return (
-    <div className=" mx-auto space-y-6">
+    <div className="mx-auto max-w-4xl space-y-6">
       {/* HEADER */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-bold">Add Quote</h1>
 
         <Button variant="outline" onClick={() => navigate(-1)}>

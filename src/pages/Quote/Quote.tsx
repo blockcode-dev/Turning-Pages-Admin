@@ -5,7 +5,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Papa from "papaparse";
-import "./Quote.scss";
 import {
   Table,
   TableBody,
@@ -18,7 +17,7 @@ import { ArrowUpDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 
-import { Eye, Pencil, Trash2, Plus } from "lucide-react";
+import { BookOpen, Eye, Pencil, Plus, Trash2, Upload } from "lucide-react";
 
 import {
   GetAllQuotesAPI,
@@ -184,10 +183,6 @@ export default function QuotesPage() {
     return pages;
   };
 
-  useEffect(() => {
-    setPage(1);
-  }, [debouncedSearch]);
-
   const handleCSVUpload = (file: File) => {
     Papa.parse(file, {
       header: true,
@@ -253,17 +248,17 @@ Jane Smith,"Stay strong and keep going.","Success|Growth"`;
   };
 
   return (
-    <div className="max-w-7xl space-y-6">
+    <div className="space-y-6">
       {/* HEADER */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Quotes</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold">Quotes</h1>
           <p className="text-muted-foreground mt-1">
             Browse and manage all quotes.
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <input
             id="csvUpload"
             type="file"
@@ -286,12 +281,14 @@ Jane Smith,"Stay strong and keep going.","Success|Growth"`;
               document.getElementById("csvUpload")?.click();
             }}
           >
-            📂 Upload CSV
+            <Upload className="h-4 w-4" />
+            Upload CSV
           </Button>
 
           {/* Instructions button */}
           <Button variant="secondary" onClick={() => setShowInstructions(true)}>
-            📘 Instructions
+            <BookOpen className="h-4 w-4" />
+            Instructions
           </Button>
 
           {/* File name */}
@@ -304,7 +301,7 @@ Jane Smith,"Stay strong and keep going.","Success|Growth"`;
             placeholder="Search quotes or authors..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-72"
+            className="w-full sm:w-72"
           />
 
           <Button onClick={() => navigate("/quotes/add")}>
@@ -505,8 +502,8 @@ Jane Smith,"Stay strong and keep going.","Success|Growth"`;
       </Card>
 
       {showInstructions && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-[650px] max-h-[80vh] overflow-y-auto shadow-xl">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-card rounded-lg p-6 w-full max-w-[650px] max-h-[80vh] overflow-y-auto shadow-xl">
             {/* HEADER */}
             <h2 className="text-xl font-bold mb-4">
               📘 How to Upload Quotes CSV

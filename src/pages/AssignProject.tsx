@@ -138,7 +138,7 @@ const AssignProject = () => {
 					<ArrowLeft className="h-4 w-4" />
 				</Button>
 				<div>
-					<h1 className="text-3xl font-bold text-foreground">Assign Project</h1>
+					<h1 className="text-2xl sm:text-3xl font-bold text-foreground">Assign Project</h1>
 					<p className="text-muted-foreground mt-1">
 						Assign manuscript to an available editor
 					</p>
@@ -158,7 +158,7 @@ const AssignProject = () => {
 						</CardHeader>
 
 						<CardContent className="space-y-4">
-							<div className="grid grid-cols-2 gap-4">
+							<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 								<div>
 									<div className="flex items-center gap-2 text-sm text-muted-foreground">
 										<BookOpen className="h-4 w-4" />
@@ -350,10 +350,10 @@ const AssignProject = () => {
                 w-4 h-4 rounded-full border-2
                 ${
 									isActive
-										? "bg-red-600 border-red-600"
+										? "bg-primary border-primary"
 										: isCompleted
-										? "bg-red-600 border-red-600"
-										: "bg-white border-gray-400"
+										? "bg-primary border-primary"
+										: "bg-white border-input"
 								}
               `}
 												/>
@@ -363,7 +363,7 @@ const AssignProject = () => {
 													<div
 														className={`
                   w-0.5 h-10
-                  ${isCompleted || isActive ? "bg-red-600" : "bg-gray-300"}
+                  ${isCompleted || isActive ? "bg-primary" : "bg-muted-foreground/40"}
                 `}
 													></div>
 												)}
@@ -379,7 +379,7 @@ const AssignProject = () => {
 										? "text-red-600"
 										: isCompleted
 										? "text-red-600"
-										: "text-gray-500"
+										: "text-muted-foreground"
 								}
               `}
 												>
@@ -388,7 +388,7 @@ const AssignProject = () => {
 
 												{/* Subtext */}
 												{isCompleted && (
-													<p className="text-xs text-gray-500">Completed</p>
+													<p className="text-xs text-muted-foreground">Completed</p>
 												)}
 												{isActive && index !== timeline.length - 1 && (
 													<p className="text-xs text-red-500">Next Stage</p>

@@ -198,7 +198,7 @@ const ProjectDetails = () => {
 	const isInEditing = project.status?.toLowerCase().trim() === "in-editing";
 
 	return (
-		<div className="space-y-5 max-w-7xl px-2 sm:px-0">
+		<div className="space-y-5">
 
 			{/* ── Header ── */}
 			<div className="flex items-start gap-3">

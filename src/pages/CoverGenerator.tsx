@@ -17,9 +17,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Sparkles,
-  Download,
   Save,
-  FileText,
   Loader2,
   Image as ImageIcon,
 } from "lucide-react";
@@ -29,8 +27,8 @@ import {
   GetProjectDetailsAPI,
   UpdateBookCoverAPI,
 } from "@/services/Api/ProjectApi";
+import { IMAGE_BASE_URL } from "@/config/env";
 
-const IMAGE_BASE_URL = "https://api.turningpages.io/images";
 const sizes = ["512x512", "768x1024", "1024x1024"];
 
 const CoverGenerator = () => {
@@ -138,7 +136,7 @@ const CoverGenerator = () => {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Cover Generator</h1>
+      <h1 className="text-2xl sm:text-3xl font-bold">Cover Generator</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* LEFT */}

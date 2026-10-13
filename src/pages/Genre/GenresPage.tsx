@@ -1,10 +1,9 @@
 /** @format */
 
 import { useEffect, useState } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card,   CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import "./Genre.scss";
 import {
   Dialog,
   DialogContent,
@@ -161,11 +160,11 @@ export default function GenresPage() {
   });
 
   return (
-    <div className="max-w-6xl space-y-6">
+    <div className="space-y-6">
       {/* PAGE HEADER */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Genre</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold">Genre</h1>
           <p className="text-muted-foreground mt-1">
             Manage all book genres used across manuscripts.
           </p>

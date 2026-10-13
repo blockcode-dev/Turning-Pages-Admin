@@ -17,12 +17,14 @@ import { useNavigate } from "react-router-dom";
 
 import { Eye } from "lucide-react";
 import { GetAllFeedsAPI } from "@/services/Api/FeedsApi";
+import { useDebounce } from "@/hooks/use-debounce";
 
 
 export default function FeedsPage() {
 	const [feeds, setFeeds] = useState<any[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [search, setSearch] = useState("");
+	const debouncedSearch = useDebounce(search);
 
 	const [page, setPage] = useState(1);
 	const [total, setTotal] = useState(0);
@@ -40,7 +42,7 @@ export default function FeedsPage() {
 			const res = await GetAllFeedsAPI({
 				page,
 				limit,
-				search,
+				search: debouncedSearch,
 			});
 
 			const data = res?.data?.data;
@@ -59,16 +61,16 @@ export default function FeedsPage() {
 
 	useEffect(() => {
 		loadFeeds();
-	}, [page, search]);
+	}, [page, debouncedSearch]);
 
 	const totalPages = Math.ceil(total / limit);
 
 	return (
-		<div className="max-w-7xl space-y-6">
+		<div className="space-y-6">
 			{/* HEADER */}
-			<div className="flex items-center justify-between">
+			<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 				<div>
-					<h1 className="text-3xl font-bold">Feeds</h1>
+					<h1 className="text-2xl sm:text-3xl font-bold">Feeds</h1>
 					<p className="text-muted-foreground mt-1">
 						Manage all user posts.
 					</p>
@@ -81,7 +83,7 @@ export default function FeedsPage() {
 						setPage(1);
 						setSearch(e.target.value);
 					}}
-					className="w-72"
+					className="w-full sm:w-72"
 				/>
 			</div>
 

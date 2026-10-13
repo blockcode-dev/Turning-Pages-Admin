@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { GetFeedByIdAPI } from "@/services/Api/FeedsApi";
+import { IMAGE_BASE_URL } from "@/config/env";
 
 export default function FeedViewPage() {
 	const { id } = useParams();
@@ -103,7 +104,7 @@ export default function FeedViewPage() {
 					{/* IMAGE */}
 					{feed.img_uri && (
 						<img
-							src={`https://api.turningpages.io/images/${feed.img_uri}`}
+							src={`${IMAGE_BASE_URL}/${feed.img_uri}`}
 							className="rounded-xl w-full h-[220px] object-cover"
 						/>
 					)}

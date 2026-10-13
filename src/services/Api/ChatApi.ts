@@ -1,10 +1,7 @@
 /** @format */
 
 import axios from "axios";
-
-const API_BASE_URL =
-	import.meta.env.VITE_API_BASE_URL ||
-	"https://api.turningpages.io/api/v1/";
+import { API_BASE_URL } from "@/config/env";
 
 export const GetAllChatListApi = () => {
 	const token = localStorage.getItem("token");

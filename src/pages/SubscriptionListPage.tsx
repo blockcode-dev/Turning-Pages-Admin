@@ -69,7 +69,7 @@ const getStatusBadge = (status: string) => {
 			);
 		case "expired":
 			return (
-				<span className="bg-gray-100 text-gray-700 px-2 py-1 text-xs rounded font-medium">
+				<span className="bg-muted text-foreground px-2 py-1 text-xs rounded font-medium">
 					Expired
 				</span>
 			);
@@ -147,10 +147,10 @@ export default function SubscriptionPage() {
 	}, [search, subs]);
 
 	return (
-		<div className="max-w-7xl space-y-6">
-			<div className="flex justify-between items-center">
+		<div className="space-y-6">
+			<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 				<div>
-					<h1 className="text-3xl font-bold">Subscriptions</h1>
+					<h1 className="text-2xl sm:text-3xl font-bold">Subscriptions</h1>
 					<p className="text-muted-foreground">
 						Recurring credit plans (auto-renewal)
 					</p>
@@ -160,7 +160,7 @@ export default function SubscriptionPage() {
 					placeholder="Search name, email, package..."
 					value={search}
 					onChange={(e) => setSearch(e.target.value)}
-					className="w-80"
+					className="w-full sm:w-80"
 				/>
 			</div>
 

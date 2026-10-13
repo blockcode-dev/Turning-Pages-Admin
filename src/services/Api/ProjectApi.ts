@@ -1,7 +1,5 @@
 import axios from "axios";
-
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "https://api.turningpages.io/api/v1/";
+import { API_BASE_URL } from "@/config/env";
 
 
 export const GetAllProjectsAPI = async () => {
@@ -38,6 +36,7 @@ export const GenerateCoverAPI = (payload: {
   author: string;
   size: string;
   direction: string;
+  description?: string;
 }) => {
   const token = localStorage.getItem("token");
   return axios.post(

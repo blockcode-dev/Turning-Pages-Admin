@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { CreateUserAPI } from "@/services/Api/UserApi";
-import "./AddUser.scss";
+import "./Adduser.scss";
 
 /* ── Password generator ──
    Uses crypto.getRandomValues, guarantees one of each character class,

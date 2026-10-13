@@ -96,6 +96,7 @@ const Chat: React.FC = () => {
 	const isDirectChat = !!book_room_id;
 	const [participants, setParticipants] = useState<any[]>([]);
 	const [showParticipants, setShowParticipants] = useState(false);
+	const participantsCache = useRef<Record<string, any[]>>({});
 
 	const currentMessages: Message[] = selectedUser
 		? messagesByRoom[String(selectedUser.id)] || []
@@ -116,20 +117,30 @@ const Chat: React.FC = () => {
 		setShowParticipants(false);
 	}, [selectedUser]);
 
+	// Members are only needed when the dropdown is open; load them on demand
+	// and cache per room so switching chats doesn't trigger extra requests.
 	useEffect(() => {
-		if (!selectedUser?.id) return;
+		if (!showParticipants || !selectedUser?.id) return;
+		const roomId = String(selectedUser.id);
+		if (participantsCache.current[roomId]) {
+			setParticipants(participantsCache.current[roomId]);
+			return;
+		}
 
-		const fetchParticipants = async () => {
-			try {
-				const res = await GetAllParticipants(selectedUser.id);
-				setParticipants(res?.data?.data || []);
-			} catch (err) {
-				console.error("Failed to load participants", err);
-			}
+		let cancelled = false;
+		setParticipants([]);
+		GetAllParticipants(selectedUser.id)
+			.then((res) => {
+				const list = res?.data?.data || [];
+				participantsCache.current[roomId] = list;
+				if (!cancelled) setParticipants(list);
+			})
+			.catch((err) => console.error("Failed to load participants", err));
+
+		return () => {
+			cancelled = true;
 		};
-
-		fetchParticipants();
-	}, [selectedUser]);
+	}, [showParticipants, selectedUser?.id]);
 
 	/* ── Fetch chat list ── */
 	useEffect(() => {
@@ -338,7 +349,7 @@ const Chat: React.FC = () => {
 		selectedUser?.chat_room?.participants?.length ?? null;
 
 	return (
-		<div className="chat-panel">
+		<div className={`chat-panel ${selectedUser ? "has-selection" : ""}`}>
 			{/* ── Sidebar ── */}
 			{!isDirectChat && (
 				<div className="chat-sidebar">
@@ -399,13 +410,20 @@ const Chat: React.FC = () => {
 					<>
 						{/* Header */}
 						<div className="chat-header">
-							  <button
-    className="header-back-btn"
-    onClick={() => window.history.back()}
-    title="Go back"
-  >
-    &#8592;
-  </button>
+							<button
+								className="header-back-btn"
+								onClick={() => {
+									// On phones the list and conversation are separate views.
+									if (!isDirectChat && window.matchMedia("(max-width: 640px)").matches) {
+										setSelectedUser(null);
+									} else {
+										window.history.back();
+									}
+								}}
+								title="Go back"
+							>
+								&#8592;
+							</button>
 
 							<div
 								className="header-avatar"

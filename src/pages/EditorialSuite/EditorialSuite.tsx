@@ -12,12 +12,10 @@ import {
 import "./EditorialSuite.scss";
 import { Editor } from "@tinymce/tinymce-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { UpdateBookStatus, UpdateChapter } from "@/services/Api/ChatperApi";
 
 import {
-	Play,
 	Save,
 	Eye,
 	ImageIcon,
@@ -25,7 +23,6 @@ import {
 	Plus,
 	Bot,
 	X,
-	Download,
 	BookOpen,
 	Loader2,
 	FileText,
@@ -48,7 +45,6 @@ import {
 } from "@/services/Api/ChatperApi";
 import AddChapterModal from "./Chapter/AddChapterModal";
 import PdfViewer from "./PdfPreview/PdfViewer";
-import BookHeader from "./PrintModal/PrintModal";
 
 const AI_TOOLS = [
 	{ label: "Fact Check", value: "fact", icon: "🔍" },
@@ -80,8 +76,6 @@ const EditorialSuite = () => {
 
 	const [showPreview, setShowPreview] = useState(false);
 	const [bookDetails, setBookDetails] = useState<any>(null);
-
-	const [showPDF, setShowPDF] = useState(false);
 
 	const [typedSummary, setTypedSummary] = useState("");
 
@@ -394,7 +388,7 @@ const EditorialSuite = () => {
 								{selectedChapter?.id === ch.id && (
 									<ChevronRight
 										size={13}
-										style={{ color: "#C9A84C", flexShrink: 0, marginLeft: 4 }}
+										style={{ color: "hsl(var(--primary))", flexShrink: 0, marginLeft: 4 }}
 									/>
 								)}
 							</div>
@@ -489,7 +483,7 @@ const EditorialSuite = () => {
         font-family: 'DM Sans', sans-serif;
         font-size: 15px;
         line-height: 1.85;
-        color: #2a2a2a;
+        color: var(--tp-text);
         background: #ffffff;
         padding: 1rem;
       }
@@ -498,7 +492,7 @@ const EditorialSuite = () => {
 
       h1, h2, h3 {
         font-family: 'Playfair Display', serif;
-        color: #1a1a1a;
+        color: var(--tp-text);
         font-weight: 600;
         margin: 1.5rem 0 0.6rem;
       }
@@ -508,16 +502,16 @@ const EditorialSuite = () => {
       h3 { font-size: 1.15rem; }
 
       blockquote {
-        border-left: 3px solid #C9A84C;
+        border-left: 3px solid var(--tp-primary);
         margin: 1rem 0;
         padding: 0.25rem 0 0.25rem 1.25rem;
-        color: #6B6B5E;
+        color: var(--tp-text-muted);
         font-style: italic;
       }
 
       pre {
-        background: #F5F5F0;
-        border: 1px solid #E8E8E4;
+        background: var(--tp-surface-muted);
+        border: 1px solid var(--tp-border);
         border-radius: 6px;
         padding: 1rem;
         font-family: 'Courier New', monospace;
@@ -526,15 +520,15 @@ const EditorialSuite = () => {
       }
 
       table { border-collapse: collapse; width: 100%; margin-bottom: 1rem; }
-      td, th { border: 1px solid #E8E8E4; padding: 0.5rem 0.75rem; font-size: 0.875rem; }
-      th { background: #FAFAF8; font-weight: 600; }
+      td, th { border: 1px solid var(--tp-border); padding: 0.5rem 0.75rem; font-size: 0.875rem; }
+      th { background: var(--tp-bg); font-weight: 600; }
 
-      a { color: #8B6914; text-decoration: underline; }
+      a { color: var(--tp-primary); text-decoration: underline; }
       ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
       li { margin-bottom: 0.3rem; }
       strong { font-weight: 600; }
       em { font-style: italic; }
-      s { text-decoration: line-through; color: #9B9B8E; }
+      s { text-decoration: line-through; color: var(--tp-text-muted); }
 
       ::selection { background: rgba(201, 168, 76, 0.2); }
     `,
@@ -558,7 +552,7 @@ const EditorialSuite = () => {
 				{showAiPanel && (
 					<div className="ai-panel">
 						<div className="ai-panel-header">
-							<Sparkles size={15} color="#3855C7" />
+							<Sparkles size={15} className="text-primary" />
 							<span className="ai-panel-title">AI Analysis</span>
 							<button
 								className="icon-btn"
@@ -598,7 +592,7 @@ const EditorialSuite = () => {
 								<TabsContent value="plagiarism" style={{ margin: 0 }}>
 									{aiLoading && activeTab === "plagiarism" ? (
 										<div className="ai-loading">
-											<Loader2 size={22} className="spin" color="#3855C7" />
+											<Loader2 size={22} className="spin text-primary" />
 											<p>Scanning for plagiarism…</p>
 										</div>
 									) : aiResult && selectedTool === "plagiarism" ? (
@@ -625,7 +619,7 @@ const EditorialSuite = () => {
 										</div>
 									) : (
 										<div className="ai-empty">
-											<CheckCircle2 size={28} color="#D4D4CA" />
+											<CheckCircle2 size={28} className="text-muted-foreground/50" />
 											<p>Select "Plagiarism" and hit Run</p>
 										</div>
 									)}
@@ -635,13 +629,13 @@ const EditorialSuite = () => {
 								<TabsContent value="summary" style={{ margin: 0 }}>
 									{aiLoading && activeTab === "summary" ? (
 										<div className="ai-loading">
-											<Loader2 size={24} className="spin" color="#3855C7" />
+											<Loader2 size={24} className="spin text-primary" />
 
 											<div style={{ textAlign: "center", marginTop: 12 }}>
 												<p style={{ fontWeight: 500 }}>
 													AI is generating your summary…
 												</p>
-												<p style={{ fontSize: 12, color: "#888" }}>
+												<p style={{ fontSize: 12 }} className="text-muted-foreground">
 													This may take a few seconds. Please wait.
 												</p>
 											</div>
@@ -652,7 +646,7 @@ const EditorialSuite = () => {
 										</div>
 									) : (
 										<div className="ai-empty">
-											<FileText size={28} color="#D4D4CA" />
+											<FileText size={28} className="text-muted-foreground/50" />
 											<p>Select "Generate Summary" and hit Run</p>
 										</div>
 									)}
@@ -662,7 +656,7 @@ const EditorialSuite = () => {
 								<TabsContent value="consistency" style={{ margin: 0 }}>
 									{aiLoading && activeTab === "consistency" ? (
 										<div className="ai-loading">
-											<Loader2 size={22} className="spin" color="#3855C7" />
+											<Loader2 size={22} className="spin text-primary" />
 											<p>Checking consistency…</p>
 										</div>
 									) : aiResult && selectedTool === "consistency" ? (
@@ -694,7 +688,7 @@ const EditorialSuite = () => {
 										</div>
 									) : (
 										<div className="ai-empty">
-											<AlertCircle size={28} color="#D4D4CA" />
+											<AlertCircle size={28} className="text-muted-foreground/50" />
 											<p>Select "Consistency Check" and hit Run</p>
 										</div>
 									)}
@@ -704,7 +698,7 @@ const EditorialSuite = () => {
 								<TabsContent value="fact" style={{ margin: 0 }}>
 									{aiLoading && activeTab === "fact" ? (
 										<div className="ai-loading">
-											<Loader2 size={22} className="spin" color="#3855C7" />
+											<Loader2 size={22} className="spin text-primary" />
 											<p>Fact-checking content…</p>
 										</div>
 									) : aiResult && selectedTool === "fact" ? (
@@ -715,7 +709,7 @@ const EditorialSuite = () => {
 										</div>
 									) : (
 										<div className="ai-empty">
-											<CheckCircle2 size={28} color="#D4D4CA" />
+											<CheckCircle2 size={28} className="text-muted-foreground/50" />
 											<p>Select "Fact Check" and hit Run</p>
 										</div>
 									)}

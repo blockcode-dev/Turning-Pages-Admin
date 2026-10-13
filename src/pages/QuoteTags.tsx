@@ -174,11 +174,11 @@ export default function QuoteTagsPage() {
   });
 
   return (
-    <div className="max-w-6xl space-y-6">
+    <div className="space-y-6">
       {/* HEADER */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Quote Tags</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold">Quote Tags</h1>
           <p className="text-muted-foreground mt-1">
             Manage tags used in quote requests and categorization.
           </p>

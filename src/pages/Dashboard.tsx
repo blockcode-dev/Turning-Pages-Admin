@@ -12,11 +12,8 @@ import {
   Users,
   ArrowRight,
   ExternalLink,
-  TrendingUp,
   Activity,
 } from "lucide-react";
-import * as XLSX from "xlsx";
-import { saveAs } from "file-saver";
 
 import { GetAdminDashboardAPI } from "@/services/Api/AdminDashboardApi";
 import { useToast } from "@/hooks/use-toast";
@@ -201,9 +198,9 @@ const handleDownloadCSV = () => {
   return (
     <div className="space-y-6">
       {/* TITLE */}
-     <div className="flex justify-between items-center">
+     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
   <div>
-    <h1 className="text-3xl font-bold">Dashboard</h1>
+    <h1 className="text-2xl sm:text-3xl font-bold">Dashboard</h1>
     <p className="text-muted-foreground mt-2">
       Welcome to the Turning Pages Admin Panel
     </p>

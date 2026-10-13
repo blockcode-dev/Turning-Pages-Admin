@@ -4,7 +4,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Badge } from "@/components/ui/badge";
 import { 
   LineChart, 
   Line, 
@@ -64,7 +63,7 @@ const editorWorkload = [
 ];
 
 const genreDistribution = [
-  { name: "Fiction", value: 35, color: "#cb252d" },
+  { name: "Fiction", value: 35, color: "#cf2631" },
   { name: "Non-Fiction", value: 25, color: "#dc2626" },
   { name: "Romance", value: 20, color: "#ef4444" },
   { name: "Mystery", value: 12, color: "#f87171" },
@@ -128,9 +127,9 @@ const Analytics = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Analytics Dashboard</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Analytics Dashboard</h1>
           <p className="text-muted-foreground mt-2">
             Track performance metrics and insights for your editorial operations
           </p>
@@ -244,9 +243,9 @@ const Analytics = () => {
                 <Line 
                   type="monotone" 
                   dataKey="submissions" 
-                  stroke="#cb252d" 
+                  stroke="#cf2631" 
                   strokeWidth={2}
-                  dot={{ fill: '#cb252d', strokeWidth: 2, r: 4 }}
+                  dot={{ fill: '#cf2631', strokeWidth: 2, r: 4 }}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -269,7 +268,7 @@ const Analytics = () => {
                   cx="50%"
                   cy="50%"
                   outerRadius={80}
-                  fill="#8884d8"
+                  fill="#cf2631"
                   dataKey="value"
                   label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                 >
@@ -308,7 +307,7 @@ const Analytics = () => {
                   }}
                 />
                 <Bar dataKey="completed" stackId="a" fill="#22c55e" name="Completed" />
-                <Bar dataKey="inProgress" stackId="a" fill="#cb252d" name="In Progress" />
+                <Bar dataKey="inProgress" stackId="a" fill="#cf2631" name="In Progress" />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>

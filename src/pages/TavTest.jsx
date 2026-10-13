@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { API_BASE_URL } from "@/config/env";
 import {
   BookOpen,
   CheckCircle2,
@@ -125,7 +126,7 @@ export default function TavTest() {
       setError(null);
 
       const res = await axios.post(
-        "https://api.turningpages.io/api/v1/tav/run-analysis",
+        `${API_BASE_URL}tav/run-analysis`,
         {
           book_id: 33,
         },
